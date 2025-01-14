@@ -5,6 +5,8 @@ VisualStudioVersion = 17.11.35312.102
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ReadCRDbgExt", "ReadCRDbgExt\ReadCRDbgExt.vcxproj", "{78BD9103-3B0A-46DF-9261-148EA8F34DF0}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ReadMSW", "ReadMSW\ReadMSW.vcxproj", "{F9AB9899-9F93-4252-B634-740F19CCC1DC}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Release|x64 = Release|x64
@@ -12,6 +14,8 @@ Global
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
 		{78BD9103-3B0A-46DF-9261-148EA8F34DF0}.Release|x64.ActiveCfg = Release|x64
 		{78BD9103-3B0A-46DF-9261-148EA8F34DF0}.Release|x64.Build.0 = Release|x64
+		{F9AB9899-9F93-4252-B634-740F19CCC1DC}.Release|x64.ActiveCfg = Release|x64
+		{F9AB9899-9F93-4252-B634-740F19CCC1DC}.Release|x64.Build.0 = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
