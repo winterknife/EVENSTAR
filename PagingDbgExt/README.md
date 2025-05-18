@@ -14,7 +14,7 @@
 
 ## Usage
 - Set up kernel-mode debugging of the target
-```shell
+```
 0: kd> vertarget
 Windows 10 Kernel Version 22000 MP (2 procs) Free x64
 Product: WinNt, suite: TerminalServer SingleUserTS
