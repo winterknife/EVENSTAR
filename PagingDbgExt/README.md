@@ -126,6 +126,15 @@ Virtual address fffff7f00000c000 translates to physical address 13000.
 Unloading PagingDbgExt extension DLL
 ```
 
+## Notes
+Since publishing this on Twitter, I have received some valid criticism from [sixtyvividtails](https://x.com/sixtyvividtails) (who btw you should follow if you are into low-level `Wintel` stuff).
+
+You can read what they wrote [here](https://github.com/winterknife/EVENSTAR/issues/1).
+
+Ultimately, this is a rehash of the technique that was first discovered by [Alex Ionescu](https://x.com/aionescu) and originally implemented by [Ulf Frisk](https://x.com/ulffrisk).
+
+I don't plan on improving the heuristics at the moment but you reading this should make the changes (or at least know what might fail and what could be improved).
+
 ## Tested OS Versions
 - `Windows 11 21H2 Build 22000 Revision 675 64-bit`
 
