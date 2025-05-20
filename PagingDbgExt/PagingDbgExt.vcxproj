@@ -63,7 +63,7 @@
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>DebugFull</GenerateDebugInformation>
       <IgnoreAllDefaultLibraries>true</IgnoreAllDefaultLibraries>
-      <AdditionalDependencies>kernel32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>Kernel32.lib;Shlwapi.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalOptions>/EMITPOGOPHASEINFO /NOVCFEATURE /NOCOFFGRPINFO /FILEALIGN:0x200 /PDBALTPATH:$(ProjectName).pdb /Brepro /RELEASE /EMITTOOLVERSIONINFO:NO /NOIMPLIB /NOEXP %(AdditionalOptions)</AdditionalOptions>
       <ShowProgress>LinkVerbose</ShowProgress>
       <LinkTimeCodeGeneration>UseLinkTimeCodeGeneration</LinkTimeCodeGeneration>
@@ -74,12 +74,14 @@
     <ClInclude Include="Inc\Common.h" />
     <ClInclude Include="Inc\DbgExt.h" />
     <ClInclude Include="Inc\GetKernelDirectoryTableBase.h" />
+    <ClInclude Include="Inc\GetProcessDirectoryTableBase.h" />
     <ClInclude Include="Inc\Help.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Src\DbgExt.cpp" />
     <ClCompile Include="Src\DllMain.cpp" />
     <ClCompile Include="Src\GetKernelDirectoryTableBase.cpp" />
+    <ClCompile Include="Src\GetProcessDirectoryTableBase.cpp" />
     <ClCompile Include="Src\Help.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

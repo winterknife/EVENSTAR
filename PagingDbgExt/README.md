@@ -1,7 +1,7 @@
 # EVENSTAR - PagingDbgExt
 
 ## Version
-- `v10.0.6`
+- `v10.1.6`
 
 ## Brief
 - `ISA: x86`

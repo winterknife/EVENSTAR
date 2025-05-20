@@ -8,7 +8,7 @@
 //
 // Modifications:
 //  2025-05-14	Created
-//  2025-05-18  Updated
+//  2025-05-20  Updated
 // ========================================================================
 
 // ========================================================================
@@ -40,8 +40,9 @@ VOID __stdcall help(
 
     dprintf(
         "Help for debugger extension DLL PagingDbgExt.dll\n"
-        "   help           - Show help menu\n"
-        "   get_kernel_dtb - Find the kernel's DTB (DirectoryTableBase) which is the physical address of the base of the paging-structure hierarchy for KVAS contained in CR3 from the Low Stub\n"
+        "   help            - Show help menu\n"
+        "   get_kernel_dtb  - Find the kernel's DTB (DirectoryTableBase) which is the physical address of the base of the paging-structure hierarchy for KVAS contained in CR3 from the Low Stub\n"
+        "   get_process_dtb - Find a process's DTB (DirectoryTableBase) which is the physical address of the base of the paging-structure hierarchy for UVAS contained in CR3 from the EPROCESS structure\n"
     );
 }
 
