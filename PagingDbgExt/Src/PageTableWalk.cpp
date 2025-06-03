@@ -216,6 +216,7 @@ VOID __stdcall get_pxe_base(
 	dprintf("[*] PML4 table auto-entry index: 0x%X (0n%d)\n", dwPML4AutoEntryIndex, dwPML4AutoEntryIndex);
 
 	// Compute PTE range starting address (first PTE)
+	// nt!MmPteBase contains the starting KVA of the PTE range
 	virtualAddress.Unused = 0xFFFF; // canonical addressing
 	virtualAddress.PML4Index = dwPML4AutoEntryIndex;
 	virtualAddress.PDPTIndex = 0x000;
@@ -320,6 +321,7 @@ VOID __stdcall get_pxe_address(
 	// The PT index (now original PD table index) selects an entry from the PD table (PT which maps the given VA is mapped as the physical page)
 	// The physical page offset (now original PT index) gives the PA of the PTE that maps the given VA
 	// Note: Whether this PxE maps the given VA depends on the page size
+	// This is similar to nt!MiGetPteAddress routine
 	virtualAddress.Value = clear_lower_bits(__ull_rshift(qwVirtualAddress, 9), 3);
 	virtualAddress.PML4Index = dwPML4AutoEntryIndex;
 	virtualAddress.Unused = 0xFFFF;
@@ -327,6 +329,7 @@ VOID __stdcall get_pxe_address(
 	dprintf("[+] PTE KVA=0x%I64X\n", qwPTEKva);
 
 	// Compute PDE KVA for the given VA
+	// This is similar to nt!MiGetPdeAddress routine
 	virtualAddress.Value = clear_lower_bits(__ull_rshift(qwVirtualAddress, 18), 3);
 	virtualAddress.PML4Index = dwPML4AutoEntryIndex;
 	virtualAddress.PDPTIndex = dwPML4AutoEntryIndex;
