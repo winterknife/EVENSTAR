@@ -7,7 +7,7 @@
 //
 // Modifications:
 //  2025-05-20	Created
-//  2025-05-20  Updated
+//  2025-05-24  Updated
 // ========================================================================
 
 // ========================================================================
@@ -43,7 +43,7 @@
 /// @param hCurrentThread Handle for the current thread
 /// @param qwCurrentPc Program counter
 /// @param dwProcessor Current processor
-/// @param strArgs Command line arguments
+/// @param strArgs Command line arguments (address of executive process object of the target process)
 /// @return None
 extern "C" __declspec(dllexport) VOID __stdcall get_process_dtb(
     _In_   HANDLE hCurrentProcess,

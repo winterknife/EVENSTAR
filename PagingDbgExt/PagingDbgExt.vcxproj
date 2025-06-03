@@ -76,6 +76,7 @@
     <ClInclude Include="Inc\GetKernelDirectoryTableBase.h" />
     <ClInclude Include="Inc\GetProcessDirectoryTableBase.h" />
     <ClInclude Include="Inc\Help.h" />
+    <ClInclude Include="Inc\PageTableWalk.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Src\DbgExt.cpp" />
@@ -83,6 +84,7 @@
     <ClCompile Include="Src\GetKernelDirectoryTableBase.cpp" />
     <ClCompile Include="Src\GetProcessDirectoryTableBase.cpp" />
     <ClCompile Include="Src\Help.cpp" />
+    <ClCompile Include="Src\PageTableWalk.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

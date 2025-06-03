@@ -9,7 +9,7 @@
 //
 // Modifications:
 //  2025-05-20	Created
-//  2025-05-20  Updated
+//  2025-05-27  Updated
 // ========================================================================
 
 // ========================================================================
@@ -54,7 +54,7 @@ VOID __stdcall get_process_dtb(
         dprintf("[-] Invalid args!\n");
         goto cleanup;
     }
-    dprintf("nt!_EPROCESS KVA=0x%I64X\n", qwEprocessKva);
+    dprintf("[*] nt!_EPROCESS KVA=0x%I64X\n", qwEprocessKva);
 
     // Get the physical address of the first table that is used in virtual address translation for UVAS contained in CR3
     // 1: kd > dt nt!_EPROCESS Pcb
