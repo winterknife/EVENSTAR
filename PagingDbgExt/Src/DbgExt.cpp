@@ -8,7 +8,7 @@
 //
 // Modifications:
 //  2024-10-08	Created
-//  2025-06-03  Updated
+//  2025-06-15  Updated
 // ========================================================================
 
 // ========================================================================
@@ -23,7 +23,7 @@
 
 #pragma region GLOBALS
 
-EXT_API_VERSION ApiVersion = { 10, 5, EXT_API_VERSION_NUMBER64, 0 };
+EXT_API_VERSION ApiVersion = { 10, 6, EXT_API_VERSION_NUMBER64, 0 };
 WINDBG_EXTENSION_APIS ExtensionApis;
 DWORD SavedMajorVersion;
 DWORD SavedMinorVersion;

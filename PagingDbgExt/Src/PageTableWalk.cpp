@@ -10,7 +10,7 @@
 //
 // Modifications:
 //  2025-05-20	Created
-//  2025-06-03  Updated
+//  2025-06-14  Updated
 // ========================================================================
 
 // ========================================================================
@@ -358,6 +358,330 @@ VOID __stdcall get_pxe_address(
 
 	// Cleanup
 cleanup:
+	return;
+}
+
+_Use_decl_annotations_
+VOID __stdcall get_physical_address(
+	HANDLE hCurrentProcess,
+	HANDLE hCurrentThread,
+	QWORD  qwCurrentPc,
+	DWORD  dwProcessor,
+	PCSTR  strArgs
+) {
+	// Init local variables
+	BOOLEAN bTranslation = FALSE;
+	VIRTUAL_ADDRESS virtualAddress; ZERO_MEMORY(&virtualAddress, sizeof(VIRTUAL_ADDRESS));
+	QWORD qwCR3 = 0;
+	QWORD qwPML4BasePa = 0;
+	QWORD qwPML4Index = 0;
+	QWORD qwPML4EPa = 0;
+	PML4E pml4e; ZERO_MEMORY(&pml4e, sizeof(PML4E));
+	DWORD dwBytesRead = 0;
+	QWORD qwPDPTBasePa = 0;
+	QWORD qwPDPTIndex = 0;
+	QWORD qwPDPTEPa = 0;
+	PDPTE pdpte; ZERO_MEMORY(&pdpte, sizeof(PDPTE));
+	QWORD qwPhysicalPageBasePa = 0;
+	QWORD qwPhysicalPageOffset = 0;
+	QWORD qwPhysicalAddress = 0;
+	BOOLEAN bReadableWritablePage = FALSE;
+	BOOLEAN bUserModePage = FALSE;
+	BOOLEAN bNonExecutablePage = FALSE;
+	BOOLEAN bDirtyPage = FALSE;
+	BOOLEAN bGlobalPage = FALSE;
+	QWORD qwPDBasePa = 0;
+	QWORD qwPDIndex = 0;
+	QWORD qwPDEPa = 0;
+	PDE pde; ZERO_MEMORY(&pde, sizeof(PDE));
+	QWORD qwPTBasePa = 0;
+	QWORD qwPTIndex = 0;
+	QWORD qwPTEPa = 0;
+	PTE pte; ZERO_MEMORY(&pte, sizeof(PTE));
+
+	// Determine if the target uses 64-bit pointers
+	if (!IsPtr64()) {
+		dprintf("[-] IA-32 target is not supported by this extension!\n");
+		goto cleanup;
+	}
+
+	// Check if paging mode == 4-level IA-32e
+	// Add a check for HLAT paging (IA32_VMX_PROCBASED_CTLS3[1] - Enable HLAT)
+	if (!check_4_level_paging_mode(hCurrentProcess, hCurrentThread, qwCurrentPc, dwProcessor, strArgs)) {
+		goto cleanup;
+	}
+
+	// Convert string representation of the VA to an integer
+	// In 4-level IA-32e paging mode, linear address width == 48
+	if (!StrToInt64ExA(strArgs, STIF_SUPPORT_HEX, (LONGLONG*)&virtualAddress.Value)) {
+		dprintf("[-] Invalid args!\n");
+		goto cleanup;
+	}
+	dprintf("[*] VA=0x%I64X\n", virtualAddress.Value);
+
+	// Convert string representation of the CR3 value to an integer
+	if (!StrToInt64ExA(StrStrA(strArgs, " "), STIF_SUPPORT_HEX, (LONGLONG*)&qwCR3)) {
+		dprintf("[-] Invalid args!\n");
+		goto cleanup;
+	}
+	dprintf("[*] CR3=0x%I64X\n", qwCR3);
+
+	// Every paging structure is 4096 bytes in size and comprises a number of individual entries
+	// In 4-level IA-32e paging mode, sizeof(paging structure entry) == 64 bits (8 bytes)
+	// In 4-level IA-32e paging mode, number of paging structure entries in each table == 512 (4096 / 8)
+	// Every valid paging structure entry contains a PFN (PA >> PAGE_SHIFT) which can be used to either reference another paging structure entry or to map a page
+
+	// CR3 contains the physical address of the first paging structure that the processor will use for linear address translation
+	// In 4-level IA-32e paging mode, the first paging structure is the Page Map Level 4 (PML4) table
+	// In 4-level IA-32e paging mode, physical address width == MAXPHYADDR (given by CPUID.80000008H:EAX[7:0], MAXPHYADDR is at most 52)
+	// In Windows x64, MAXPHYADDR == 48
+	// CR3[MAXPHYADDR–1:12] == Physical address of the 4-KByte aligned PML4 table used for linear-address translation
+	qwPML4BasePa = PFN_TO_PAGE(extract_bits(qwCR3, 12, 36), PAGE_SIZE_4KB);
+	dprintf("[+] PML4 table base PA=0x%I64X\n", qwPML4BasePa);
+
+	// Get the PML4 index from the VA
+	// A PML4E is identified using a PML4 index == VA[47:39] (9 bits)
+	qwPML4Index = virtualAddress.PML4Index;
+	dprintf("[+] PML4 index: 0x%X (0n%d)\n", qwPML4Index, qwPML4Index);
+
+	// Compute PML4E PA for the given VA
+	qwPML4EPa = qwPML4BasePa + (qwPML4Index * sizeof(PML4E));
+	dprintf("[+] PML4E PA=0x%I64X\n", qwPML4EPa);
+
+	// Read the selected PML4E for the given VA
+	// Each PML4E controls access to a 512 GB region of the linear-address space
+	ReadPhysical(qwPML4EPa, &pml4e.Value, sizeof(PML4E), &dwBytesRead);
+	if (dwBytesRead != sizeof(PML4E)) {
+		dprintf("[-] Error reading physical memory!\n");
+		goto cleanup;
+	}
+	dprintf("[+] PML4E contents=0x%I64X\n", pml4e.Value);
+
+	// Check for invalid PML4E (an entry that is used neither to reference another paging structure nor to map a page)
+	// There is no translation for a linear address whose translation would use such a paging structure entry
+	// Any access to such a VA would cause a Page Fault exception (#PF)
+	// In Windows x64, such a PxE is then interpreted by the Memory Manager as a software PTE of which there are various types
+	if (pml4e.P == 0 || pml4e.PS == 1 || pml4e.Reserved1 != 0) {
+		dprintf("[-] Invalid PML4E!\n");
+		goto cleanup;
+	}
+
+	// In 4-level IA-32e paging mode, the second paging structure is the Page Directory Pointer Table (PDPT)
+	// PML4E[MAXPHYADDR–1:12] == Physical address of 4-KByte aligned PDPT referenced by this entry
+	qwPDPTBasePa = PFN_TO_PAGE(pml4e.PFN, PAGE_SIZE_4KB);
+	dprintf("[+] PDPT base PA=0x%I64X\n", qwPDPTBasePa);
+
+	// Get the PDPT index from the VA
+	// A PDPTE is identified using a PDPT index == VA[38:30] (9 bits)
+	qwPDPTIndex = virtualAddress.PDPTIndex;
+	dprintf("[+] PDPT index: 0x%X (0n%d)\n", qwPDPTIndex, qwPDPTIndex);
+
+	// Compute PDPTE PA for the given VA
+	qwPDPTEPa = qwPDPTBasePa + (qwPDPTIndex * sizeof(PDPTE));
+	dprintf("[+] PDPTE PA=0x%I64X\n", qwPDPTEPa);
+
+	// Read the selected PDPTE for the given VA
+	// Each PDPTE controls access to a 1 GB region of the linear-address space
+	ReadPhysical(qwPDPTEPa, &pdpte.Value, sizeof(PDPTE), &dwBytesRead);
+	if (dwBytesRead != sizeof(PDPTE)) {
+		dprintf("[-] Error reading physical memory!\n");
+		goto cleanup;
+	}
+	dprintf("[+] PDPTE contents=0x%I64X\n", pdpte.Value);
+
+	// Check for invalid PDPTE (an entry that is used neither to reference another paging structure nor to map a page)
+	if (pdpte.P == 0 || pdpte.Reserved2 != 0) {
+		dprintf("[-] Invalid PDPTE!\n");
+		goto cleanup;
+	}
+
+	// Check Page Size (PS) bit of PDPTE
+	if (pdpte.PS == 1 && pdpte.Reserved1 == 0) {
+		// PDPTE maps a 1 GB page
+		// PDPTE[MAXPHYADDR–1:30] == Physical address of the 1-GByte page referenced by this entry
+		qwPhysicalPageBasePa = PFN_TO_PAGE(pdpte.PFN1, PAGE_SIZE_1GB);
+		dprintf("[+] 1 GB physical page base PA=0x%I64X\n", qwPhysicalPageBasePa);
+
+		// Get the physical page offset from the VA
+		// 1 GB physical page offset == VA[29:0] (30 bits)
+		qwPhysicalPageOffset = virtualAddress.Offset1GB;
+		dprintf("[+] 1 GB physical page offset: 0x%X (0n%d)\n", qwPhysicalPageOffset, qwPhysicalPageOffset);
+
+		// Data may be written to any linear address (subject to CPL, WP, and SMAP) with a translation for which the R/W flag (bit 1) is 1 in every paging structure entry controlling the translation
+		bReadableWritablePage = ((pml4e.RW) && (pdpte.RW));
+
+		// If the U/S flag (bit 2) is 0 in at least one of the paging structure entries controlling the translation of the linear address, the address is a supervisor-mode address
+		// Otherwise, the address is a user-mode address
+		bUserModePage = ((pml4e.US) && (pdpte.US));
+
+		// Instructions may be fetched from any linear address (subject to CPL, NXE, and SMEP) with a translation for which the XD flag (bit 63) is 0 in every paging structure entry controlling the translation
+		bNonExecutablePage = ((pml4e.XD) || (pdpte.XD));
+
+		// Whenever there is a write to a linear address, the processor sets the Dirty flag (bit 6) if it is not already set in the paging structure entry that maps the page
+		bDirtyPage = pdpte.D;
+
+		// If the Global flag (bit 8) is 1 in the paging structure entry that maps the page, any TLB entry cached for the linear address using that paging structure entry is considered to be global (subject to PGE)
+		bGlobalPage = pdpte.G;
+
+		bTranslation = TRUE;
+
+		goto cleanup;
+	}
+
+	// In 4-level IA-32e paging mode, the third paging structure is the Page Directory (PD) table
+	// PDPTE[MAXPHYADDR–1:12] == Physical address of 4-KByte aligned PD table referenced by this entry
+	qwPDBasePa = PFN_TO_PAGE(pdpte.PFN2, PAGE_SIZE_4KB);
+	dprintf("[+] PD table base PA=0x%I64X\n", qwPDBasePa);
+
+	// Get the PD index from the VA
+	// A PDE is identified using a PD index == VA[29:21] (9 bits)
+	qwPDIndex = virtualAddress.PDIndex;
+	dprintf("[+] PD index: 0x%X (0n%d)\n", qwPDIndex, qwPDIndex);
+
+	// Compute PDE PA for the given VA
+	qwPDEPa = qwPDBasePa + (qwPDIndex * sizeof(PDE));
+	dprintf("[+] PDE PA=0x%I64X\n", qwPDEPa);
+
+	// Read the selected PDE for the given VA
+	// Each PDE controls access to a 2 MB region of the linear-address space
+	ReadPhysical(qwPDEPa, &pde.Value, sizeof(PDE), &dwBytesRead);
+	if (dwBytesRead != sizeof(PDE)) {
+		dprintf("[-] Error reading physical memory!\n");
+		goto cleanup;
+	}
+	dprintf("[+] PDE contents=0x%I64X\n", pde.Value);
+
+	// Check for invalid PDE (an entry that is used neither to reference another paging structure nor to map a page)
+	if (pde.P == 0 || pde.Reserved2 != 0) {
+		dprintf("[-] Invalid PDE!\n");
+		goto cleanup;
+	}
+
+	// Check Page Size (PS) bit of PDE
+	if (pde.PS == 1 && pde.Reserved1 == 0) {
+		// PDE maps a 2 MB page
+		// PDE[MAXPHYADDR–1:21] == Physical address of the 2-MByte page referenced by this entry
+		qwPhysicalPageBasePa = PFN_TO_PAGE(pde.PFN1, PAGE_SIZE_2MB);
+		dprintf("[+] 2 MB physical page base PA=0x%I64X\n", qwPhysicalPageBasePa);
+
+		// Get the physical page offset from the VA
+		// 2 MB physical page offset == VA[20:0] (21 bits)
+		qwPhysicalPageOffset = virtualAddress.Offset2MB;
+		dprintf("[+] 2 MB physical page offset: 0x%X (0n%d)\n", qwPhysicalPageOffset, qwPhysicalPageOffset);
+
+		// Data may be written to any linear address (subject to CPL, WP, and SMAP) with a translation for which the R/W flag (bit 1) is 1 in every paging structure entry controlling the translation
+		bReadableWritablePage = ((pml4e.RW) && (pdpte.RW) && (pde.RW));
+
+		// If the U/S flag (bit 2) is 0 in at least one of the paging structure entries controlling the translation of the linear address, the address is a supervisor-mode address
+		// Otherwise, the address is a user-mode address
+		bUserModePage = ((pml4e.US) && (pdpte.US) && (pde.US));
+
+		// Instructions may be fetched from any linear address (subject to CPL, NXE, and SMEP) with a translation for which the XD flag (bit 63) is 0 in every paging structure entry controlling the translation
+		bNonExecutablePage = ((pml4e.XD) || (pdpte.XD) || (pde.XD));
+
+		// Whenever there is a write to a linear address, the processor sets the Dirty flag (bit 6) if it is not already set in the paging structure entry that maps the page
+		bDirtyPage = pde.D;
+
+		// If the Global flag (bit 8) is 1 in the paging structure entry that maps the page, any TLB entry cached for the linear address using that paging structure entry is considered to be global (subject to PGE)
+		bGlobalPage = pde.G;
+
+		bTranslation = TRUE;
+
+		goto cleanup;
+	}
+
+	// In 4-level IA-32e paging mode, the fourth paging structure is the Page Table (PT)
+	// PDE[MAXPHYADDR–1:12] == Physical address of 4-KByte aligned PT referenced by this entry
+	qwPTBasePa = PFN_TO_PAGE(pde.PFN2, PAGE_SIZE_4KB);
+	dprintf("[+] PT base PA=0x%I64X\n", qwPTBasePa);
+
+	// Get the PT index from the VA
+	// A PTE is identified using a PT index == VA[20:12] (9 bits)
+	qwPTIndex = virtualAddress.PTIndex;
+	dprintf("[+] PT index: 0x%X (0n%d)\n", qwPTIndex, qwPTIndex);
+
+	// Compute PTE PA for the given VA
+	qwPTEPa = qwPTBasePa + (qwPTIndex * sizeof(PTE));
+	dprintf("[+] PTE PA=0x%I64X\n", qwPTEPa);
+
+	// Read the selected PTE for the given VA
+	// Each PTE controls access to a 4 KB region of the linear-address space
+	ReadPhysical(qwPTEPa, &pte.Value, sizeof(PTE), &dwBytesRead);
+	if (dwBytesRead != sizeof(PTE)) {
+		dprintf("[-] Error reading physical memory!\n");
+		goto cleanup;
+	}
+	dprintf("[+] PTE contents=0x%I64X\n", pte.Value);
+
+	// Check for invalid PTE (an entry that is used neither to reference another paging structure nor to map a page)
+	if (pte.P == 0 || pte.Reserved1 != 0) {
+		dprintf("[-] Invalid PTE!\n");
+		goto cleanup;
+	}
+
+	// PTE maps a 4 KB page
+	// PTE[MAXPHYADDR–1:12] == Physical address of the 4-KByte page referenced by this entry
+	qwPhysicalPageBasePa = PFN_TO_PAGE(pte.PFN, PAGE_SIZE_4KB);
+	dprintf("[+] 4 KB physical page base PA=0x%I64X\n", qwPhysicalPageBasePa);
+
+	// Get the physical page offset from the VA
+	// 4 KB physical page offset == VA[11:0] (12 bits)
+	qwPhysicalPageOffset = virtualAddress.Offset4KB;
+	dprintf("[+] 4 KB physical page offset: 0x%X (0n%d)\n", qwPhysicalPageOffset, qwPhysicalPageOffset);
+
+	// Data may be written to any linear address (subject to CPL, WP, and SMAP) with a translation for which the R/W flag (bit 1) is 1 in every paging structure entry controlling the translation
+	bReadableWritablePage = ((pml4e.RW) && (pdpte.RW) && (pde.RW) && (pte.RW));
+
+	// If the U/S flag (bit 2) is 0 in at least one of the paging structure entries controlling the translation of the linear address, the address is a supervisor-mode address
+	// Otherwise, the address is a user-mode address
+	bUserModePage = ((pml4e.US) && (pdpte.US) && (pde.US) && (pte.US));
+
+	// Instructions may be fetched from any linear address (subject to CPL, NXE, and SMEP) with a translation for which the XD flag (bit 63) is 0 in every paging structure entry controlling the translation
+	bNonExecutablePage = ((pml4e.XD) || (pdpte.XD) || (pde.XD) || (pte.XD));
+
+	// Whenever there is a write to a linear address, the processor sets the Dirty flag (bit 6) if it is not already set in the paging structure entry that maps the page
+	bDirtyPage = pte.D;
+
+	// If the Global flag (bit 8) is 1 in the paging structure entry that maps the page, any TLB entry cached for the linear address using that paging structure entry is considered to be global (subject to PGE)
+	bGlobalPage = pte.G;
+
+	bTranslation = TRUE;
+
+	// Cleanup
+cleanup:
+	if (bTranslation) {
+		// Get mapped physical address (PA)
+		qwPhysicalAddress = qwPhysicalPageBasePa + qwPhysicalPageOffset;
+		dprintf("[+] PA=0x%I64X\n", qwPhysicalAddress);
+
+		// Display the access rights for the linear address
+		// Data reads, data writes, and instruction fetches to/from the linear address depend on the access rights specified by the paging structure entries controlling the translation
+		if (bReadableWritablePage) {
+			dprintf("[+] Writable address.\n");
+		}
+		else {
+			dprintf("[+] Read-only address.\n");
+		}
+
+		if (bUserModePage) {
+			dprintf("[+] User-mode address.\n");
+		}
+		else {
+			dprintf("[+] Supervisor-mode address.\n");
+		}
+
+		if (bNonExecutablePage) {
+			dprintf("[+] Non-executable address.\n");
+		}
+		else {
+			dprintf("[+] Executable address.\n");
+		}
+
+		dprintf("[+] Dirty: %d\n", bDirtyPage);
+
+		dprintf("[+] Global: %d\n", bGlobalPage);
+	}
+
 	return;
 }
 

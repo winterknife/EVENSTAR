@@ -8,7 +8,7 @@
 //
 // Modifications:
 //  2025-05-14	Created
-//  2025-06-03  Updated
+//  2025-06-15  Updated
 // ========================================================================
 
 // ========================================================================
@@ -47,6 +47,7 @@ VOID __stdcall help(
         "   get_pml4_autoentry_index  - Find the self-reference entry/auto-entry index of the Page Map Level 4 (PML4) table from the CR3\n"
         "   get_pxe_base              - Compute the starting KVA of the paging structure entry (PxE) range from the PML4 table auto-entry index\n"
         "   get_pxe_address           - Compute the KVA of the paging structure entry (PxE) that maps the specified VA from the PML4 table auto-entry index\n"
+        "   get_physical_address      - Translate the specified linear address (VA) to its mapped physical address (PA) and determine the VA's access rights from the CR3\n"
     );
 }
 

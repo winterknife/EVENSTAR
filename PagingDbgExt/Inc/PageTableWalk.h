@@ -7,7 +7,7 @@
 //
 // Modifications:
 //  2025-05-20	Created
-//  2025-06-02  Updated
+//  2025-06-08  Updated
 // ========================================================================
 
 // ========================================================================
@@ -108,6 +108,120 @@ typedef union _PML4E {
 } PML4E, *PPML4E;
 #pragma warning(pop)
 
+// PDPT Entry (PDPTE)
+#pragma warning(push)
+#pragma warning(disable: 4201)
+typedef union _PDPTE {
+    struct {
+        QWORD P         :  1; // Present
+        QWORD RW        :  1; // Read/Write
+        QWORD US        :  1; // User/Supervisor
+        QWORD PWT       :  1; // Page-level Write Through
+        QWORD PCD       :  1; // Page-level Cache Disable
+        QWORD A         :  1; // Accessed
+        QWORD D         :  1; // Dirty
+        QWORD PS        :  1; // Page Size (must be set if entry maps a 1 GB page), reserved (must be 0) if processor doesn't support huge pages
+        QWORD G         :  1; // Global (if CR4.PGE = 1, determines whether the translation is global, ignored otherwise)
+        QWORD Ignored1  :  2; // Ignored
+        QWORD R         :  1; // Restart (HLAT paging)
+        QWORD PAT       :  1; // Page Attribute Table (PAT)
+        QWORD Reserved1 : 17; // Reserved (must be 0)
+        QWORD PFN1      : 18; // Physical address of the 1-GByte page referenced by this entry
+        QWORD Reserved2 :  4; // Reserved (must be 0)
+        QWORD Ignored2  :  7; // Ignored
+        QWORD PK        :  4; // Protection Key (if CR4.PKE = 1 or CR4.PKS = 1, this may control the page’s access rights, ignored otherwise)
+        QWORD XD        :  1; // Execute Disable, reserved (must be 0) if IA32_EFER.NXE = 0
+    };
+    struct {
+        QWORD           : 12;
+        QWORD PFN2      : 36; // Physical address of 4-KByte aligned page directory referenced by this entry
+        QWORD           : 16;
+    };
+    QWORD Value;
+} PDPTE, *PPDPTE;
+#pragma warning(pop)
+
+// PD Entry (PDE)
+#pragma warning(push)
+#pragma warning(disable: 4201)
+typedef union _PDE {
+    struct {
+        QWORD P         :  1; // Present
+        QWORD RW        :  1; // Read/Write
+        QWORD US        :  1; // User/Supervisor
+        QWORD PWT       :  1; // Page-level Write Through
+        QWORD PCD       :  1; // Page-level Cache Disable
+        QWORD A         :  1; // Accessed
+        QWORD D         :  1; // Dirty
+        QWORD PS        :  1; // Page Size (must be set if entry maps a 2 MB page)
+        QWORD G         :  1; // Global (if CR4.PGE = 1, determines whether the translation is global, ignored otherwise)
+        QWORD Ignored1  :  2; // Ignored
+        QWORD R         :  1; // Restart (HLAT paging)
+        QWORD PAT       :  1; // Page Attribute Table (PAT)
+        QWORD Reserved1 :  8; // Reserved (must be 0)
+        QWORD PFN1      : 27; // Physical address of the 2-MByte page referenced by this entry
+        QWORD Reserved2 :  4; // Reserved (must be 0)
+        QWORD Ignored2  :  7; // Ignored
+        QWORD PK        :  4; // Protection Key (if CR4.PKE = 1 or CR4.PKS = 1, this may control the page’s access rights, ignored otherwise)
+        QWORD XD        :  1; // Execute Disable, reserved (must be 0) if IA32_EFER.NXE = 0
+    };
+    struct {
+        QWORD           : 12;
+        QWORD PFN2      : 36; // Physical address of 4-KByte aligned page table referenced by this entry
+        QWORD           : 16;
+    };
+    QWORD Value;
+} PDE, *PPDE;
+#pragma warning(pop)
+
+// PT Entry (PTE)
+#pragma warning(push)
+#pragma warning(disable: 4201)
+typedef union _PTE {
+    struct {
+        QWORD P         :  1; // Present
+        QWORD RW        :  1; // Read/Write
+        QWORD US        :  1; // User/Supervisor
+        QWORD PWT       :  1; // Page-level Write Through
+        QWORD PCD       :  1; // Page-level Cache Disable
+        QWORD A         :  1; // Accessed
+        QWORD D         :  1; // Dirty
+        QWORD PAT       :  1; // Page Attribute Table (PAT)
+        QWORD G         :  1; // Global (if CR4.PGE = 1, determines whether the translation is global, ignored otherwise)
+        QWORD Ignored1  :  2; // Ignored
+        QWORD R         :  1; // Restart (HLAT paging)
+        QWORD PFN       : 36; // Physical address of the 4-KByte page referenced by this entry
+        QWORD Reserved1 :  4; // Reserved (must be 0)
+        QWORD Ignored2  :  7; // Ignored
+        QWORD PK        :  4; // Protection Key (if CR4.PKE = 1 or CR4.PKS = 1, this may control the page’s access rights, ignored otherwise)
+        QWORD XD        :  1; // Execute Disable, reserved (must be 0) if IA32_EFER.NXE = 0
+    };
+    QWORD Value;
+} PTE, *PPTE;
+#pragma warning(pop)
+
+// Windows x64 hardware PxE (MMU's interpretation)
+typedef struct _MMPTE_HARDWARE {
+    QWORD Valid               :  1; // Present
+    QWORD Dirty1              :  1; // Read/Write (cleared together with Dirty bit)
+    QWORD Owner               :  1; // User/Supervisor
+    QWORD WriteThrough        :  1; // Page-level Write Through
+    QWORD CacheDisable        :  1; // Page-level Cache Disable
+    QWORD Accessed            :  1; // Accessed
+    QWORD Dirty               :  1; // Dirty
+    QWORD LargePage           :  1; // Page Attribute Table (PAT) or Page Size (PS)
+    QWORD Global              :  1; // Global
+    QWORD CopyOnWrite         :  1; // Copy On Write (CoW)
+    QWORD Unused              :  1; // Ignored
+    QWORD Write               :  1; // Used by the Memory Manager to recognize the page as writable
+    QWORD PageFrameNumber     : 36; // Page Frame Number (PFN)
+    QWORD ReservedForHardware :  4; // Reserved (must be 0)
+    QWORD ReservedForSoftware :  4; // Reserved (must be 0)
+    QWORD WsleAge             :  4; // Working Set List Entry (WSLE)
+    QWORD WsleProtection      :  3; // Working Set List Entry (WSLE)
+    QWORD NoExecute           :  1; // Execute Disable (XD/NX)
+} MMPTE_HARDWARE, *PMMPTE_HARDWARE;
+
 #pragma endregion
 
 // ========================================================================
@@ -170,6 +284,21 @@ extern "C" __declspec(dllexport) VOID __stdcall get_pxe_base(
 /// @param strArgs Command line arguments (VA and PML4 table auto-entry index)
 /// @return None
 extern "C" __declspec(dllexport) VOID __stdcall get_pxe_address(
+    _In_   HANDLE hCurrentProcess,
+    _In_   HANDLE hCurrentThread,
+    _In_   QWORD  qwCurrentPc,
+    _In_   DWORD  dwProcessor,
+    _In_z_ PCSTR  strArgs
+);
+
+/// @brief Built-in command to translate the specified linear address (VA) to its mapped physical address (PA) and determine the VA's access rights from the CR3
+/// @param hCurrentProcess Handle for the current process
+/// @param hCurrentThread Handle for the current thread
+/// @param qwCurrentPc Program counter
+/// @param dwProcessor Current processor
+/// @param strArgs Command line arguments (VA and CR3 value)
+/// @return None
+extern "C" __declspec(dllexport) VOID __stdcall get_physical_address(
     _In_   HANDLE hCurrentProcess,
     _In_   HANDLE hCurrentThread,
     _In_   QWORD  qwCurrentPc,
