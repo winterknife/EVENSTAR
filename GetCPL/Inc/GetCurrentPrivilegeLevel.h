@@ -1,13 +1,13 @@
 // ========================================================================
-// File: ReadMsw.h
+// File: GetCurrentPrivilegeLevel.h
 //
 // Author: winterknife
 //
-// Description: Header file for ReadMsw32/64.asm source file
+// Description: Header file for GetCurrentPrivilegeLevel32/64.asm source file
 //
 // Modifications:
-//  2025-01-09	Created
-//  2025-01-09  Updated
+//  2025-06-16	Created
+//  2025-06-16  Updated
 // ========================================================================
 
 // ========================================================================
@@ -28,11 +28,11 @@
 
 #pragma region DECLARATIONS
 
-/// @brief Check if segment-level protection is enabled
+/// @brief Check the Current Privilege Level (CPL) of the processor
 /// @param None
-/// @return Returns TRUE if protected mode is enabled or FALSE if real-address mode is enabled
-_Success_(return != 0) _Must_inspect_result_ _IRQL_requires_max_(DISPATCH_LEVEL)
-extern "C" __declspec(noinline) BOOLEAN __fastcall is_protected_mode_enabled(
+/// @return Returns TRUE if CPL < 3 (supervisor-mode) or FALSE if CPL = 3 (user-mode)
+_Success_(return != 0) _Must_inspect_result_ _IRQL_requires_max_(HIGH_LEVEL)
+extern "C" __declspec(noinline) BOOLEAN __fastcall is_supervisor_mode(
 	VOID
 );
 

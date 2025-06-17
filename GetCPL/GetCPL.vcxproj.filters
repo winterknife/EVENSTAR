@@ -16,7 +16,7 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <MASM Include="Src\ReadMsw64.asm">
+    <MASM Include="Src\GetCurrentPrivilegeLevel64.asm">
       <Filter>Source Files</Filter>
     </MASM>
   </ItemGroup>
@@ -27,7 +27,7 @@
     <ClInclude Include="Inc\Common.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Inc\ReadMsw.h">
+    <ClInclude Include="Inc\GetCurrentPrivilegeLevel.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

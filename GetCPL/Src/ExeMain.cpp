@@ -7,7 +7,7 @@
 //
 // Modifications:
 //  2025-01-08	Created
-//  2025-01-09  Updated
+//  2025-06-16  Updated
 // ========================================================================
 
 // ========================================================================
@@ -15,7 +15,7 @@
 // ========================================================================
 
 #include "../Inc/Common.h"
-#include "../Inc/ReadMsw.h"
+#include "../Inc/GetCurrentPrivilegeLevel.h"
 #define _NO_CRT_STDIO_INLINE
 #include <stdio.h>
 #include <process.h>
@@ -30,7 +30,7 @@
 /// @brief EXE entry point
 /// @param None
 /// @return None
-extern "C" __declspec(noreturn) VOID __stdcall ExeInit(
+extern "C" __declspec(noreturn) VOID __stdcall ExeEntry(
 	VOID
 ) {
 	printf("[*] %s Built %s %s\n", __MODULE__, __DATE__, __TIME__);
@@ -45,14 +45,16 @@ extern "C" __declspec(noreturn) VOID __stdcall ExeInit(
 	__nop();
 
 	// Init local variables
-	BOOLEAN bProtectionEnable = FALSE;
+	BOOLEAN bSupervisorMode = FALSE;
 
-	// Check if Segmentation is enabled
-	bProtectionEnable = is_protected_mode_enabled();
-	if (bProtectionEnable)
-		printf("Processor Execution Mode == Protected Mode\n");
-	else
-		printf("Processor Execution Mode == Real-Address Mode\n");
+	// Check processor's CPL
+	bSupervisorMode = is_supervisor_mode();
+	if (bSupervisorMode) {
+		DEBUG_PRINT("supervisor-mode\n");
+	}
+	else {
+		DEBUG_PRINT("user-mode\n");
+	}
 
 	__nop();
 	__nop();

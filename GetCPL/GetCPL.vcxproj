@@ -10,7 +10,7 @@
     <VCProjectVersion>16.0</VCProjectVersion>
     <Keyword>Win32Proj</Keyword>
     <ProjectGuid>{f9ab9899-9f93-4252-b634-740f19ccc1dc}</ProjectGuid>
-    <RootNamespace>ReadMSW</RootNamespace>
+    <RootNamespace>GetCPL</RootNamespace>
     <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
@@ -72,14 +72,14 @@
     <ClCompile Include="Src\ExeMain.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <MASM Include="Src\ReadMsw64.asm">
+    <MASM Include="Src\GetCurrentPrivilegeLevel64.asm">
       <FileType>Document</FileType>
     </MASM>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Inc\BaseDataTypes.h" />
     <ClInclude Include="Inc\Common.h" />
-    <ClInclude Include="Inc\ReadMsw.h" />
+    <ClInclude Include="Inc\GetCurrentPrivilegeLevel.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
