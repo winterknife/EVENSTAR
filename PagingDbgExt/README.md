@@ -266,3 +266,4 @@ I don't plan on improving the heuristics at the moment but you reading this shou
 34. [Paging](https://shhoya.github.io/hv_paging.html)
 35. [Demystifying Physical Memory Primitive Exploitation on Windows](https://0dr3f.github.io/Demystifying_Physical_Memory_Primitive_Exploitation_on_Windows)
 36. [Intel® 64 and IA-32 Architectures Software Developer Manuals](https://www.intel.com/content/www/us/en/developer/articles/technical/intel-sdm.html)
+37. [PTEditor](https://github.com/misc0110/PTEditor)
