@@ -11,6 +11,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "PagingDbgExt", "PagingDbgEx
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ReadIDTDbgExt", "ReadIDTDbgExt\ReadIDTDbgExt.vcxproj", "{32175898-45C7-4C47-990E-EBB9DA9D0992}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "GetCurrentProcessorNumber", "GetCurrentProcessorNumber\GetCurrentProcessorNumber.vcxproj", "{4A00FFAF-5B55-4BAB-B681-4DB692B25001}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Release|x64 = Release|x64
@@ -24,6 +26,8 @@ Global
 		{4321EA53-183E-4104-887D-5CBFC14E4211}.Release|x64.Build.0 = Release|x64
 		{32175898-45C7-4C47-990E-EBB9DA9D0992}.Release|x64.ActiveCfg = Release|x64
 		{32175898-45C7-4C47-990E-EBB9DA9D0992}.Release|x64.Build.0 = Release|x64
+		{4A00FFAF-5B55-4BAB-B681-4DB692B25001}.Release|x64.ActiveCfg = Release|x64
+		{4A00FFAF-5B55-4BAB-B681-4DB692B25001}.Release|x64.Build.0 = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

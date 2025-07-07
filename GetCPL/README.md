@@ -10,7 +10,7 @@
 - `CPL: 0, 3`
 - `OS: Windows`
 - `Language: C`
-- Sample code that demonstrates the usage of the `SMSW` instruction to fetch the the `Machine Status Word` (bits 0 through 15 of control register `CR0`) and check the processor's `Current Privilege Level (CPL)` if the processor is running in `Protected` mode.
+- Sample code that demonstrates the usage of the `SMSW` instruction to fetch the `Machine Status Word` (bits 0 through 15 of control register `CR0`) and check the processor's `Current Privilege Level (CPL)` if the processor is running in `Protected` mode
 
 ## Usage
 - There aren't a lot of useful bits in the `MSW`
@@ -19,7 +19,7 @@
 - The processor maintains an internal state called `CPL` which is defined as the privilege level of the currently executing code
 - `CPL` is used to determine whether certain operations are permitted or not
 - `CPL` is given by `CS.RPL` (bits 0 and 1)
-```shell
+```
 C:\pub\bld\DriverRun>GetCPL.exe
 [*] GetCPL Built Jun 16 2025 18:13:39
 Press any key to continue . . .
