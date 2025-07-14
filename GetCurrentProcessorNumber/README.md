@@ -5,7 +5,7 @@
 
 ## Brief
 - `ISA: x86`
-- `Mode: Protected, Long`
+- `Mode: Protected, Compatibility, Long`
 - `Bitness: 32-bit, 64-bit`
 - `CPL: 0, 3`
 - `OS: Windows`
