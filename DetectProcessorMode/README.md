@@ -46,3 +46,4 @@ msfvenom -a x64 --platform Windows --payload windows/x64/messagebox -f raw -o sh
 2. [DoublePulsar Initial SMB Backdoor Ring 0 Shellcode Analysis](https://zerosum0x0.blogspot.com/2017/04/doublepulsar-initial-smb-backdoor-ring.html)
 3. [eternalblue_sc_merge.py](https://github.com/worawit/MS17-010/blob/master/shellcode/eternalblue_sc_merge.py)
 4. [Multi-bitness x86 code](https://pagedout.institute/download/PagedOut_001_beta1.pdf)
+5. [Full Fat Shellcode](https://winternl.com/full-fat-shellcode/)
