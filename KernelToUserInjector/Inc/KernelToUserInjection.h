@@ -7,7 +7,7 @@
 //
 // Modifications:
 //  2026-04-13	Created
-//  2026-04-20  Updated
+//  2026-04-28  Updated
 // ========================================================================
 
 // ========================================================================
@@ -132,6 +132,14 @@ EXTERN_C NTSYSAPI NTSTATUS NTAPI ZwQuerySystemInformation(
     _Out_opt_                                       PULONG ReturnLength
 );
 
+EXTERN_C NTSYSCALLAPI NTSTATUS NTAPI ZwProtectVirtualMemory(
+    _In_    HANDLE  ProcessHandle,
+    _Inout_ PVOID*  BaseAddress,
+    _Inout_ PSIZE_T RegionSize,
+    _In_    ULONG   NewProtection,
+    _Out_   PULONG  OldProtection
+);
+
 typedef _Function_class_(KNORMAL_ROUTINE) _IRQL_requires_(PASSIVE_LEVEL) _IRQL_requires_same_ VOID NTAPI KNORMAL_ROUTINE(
     _In_opt_ PVOID NormalContext,
     _In_opt_ PVOID SystemArgument1,
@@ -179,19 +187,27 @@ EXTERN_C NTKERNELAPI BOOLEAN NTAPI KeInsertQueueApc(
 
 #pragma region DECLARATIONS
 
-/// @brief Find the Process ID (PID) of a process given its name and the first Thread ID (TID) of a thread in the process that is in an alertable wait state
+/// @brief Find the executive process object of a process given its name and the executive thread object of the first thread in the process that is in an alertable wait state
 /// @param puncImageName Pointer to the UNICODE_STRING structure that contains the image name of the target process
-/// @param pdwPid Pointer to a DWORD that will receive the PID of the target process, returns 0 if the routine fails
-/// @param pdwTid Pointer to a DWORD that will receive the TID of a thread in an alertable wait state, returns 0 if the routine fails
+/// @param ppEprocess Returns a referenced pointer to the EPROCESS structure of the target process, returns nullptr if the routine fails
+/// @param ppEthread Returns a referenced pointer to the ETHREAD structure of the target thread, returns nullptr if the routine fails
 /// @return STATUS_SUCCESS or an appropriate error status
 _Success_(return >= 0) _Must_inspect_result_ _IRQL_requires_(PASSIVE_LEVEL)
-EXTERN_C DECLSPEC_NOINLINE NTSTATUS __stdcall query_process_by_name(
-	_In_            PUNICODE_STRING puncImageName,
-    _Always_(_Out_) PDWORD          pdwPid,
-    _Always_(_Out_) PDWORD          pdwTid
+EXTERN_C DECLSPEC_NOINLINE NTSTATUS __stdcall query_process_thread_by_name(
+    _In_                      PUNICODE_STRING puncImageName,
+    _Outptr_result_maybenull_ PEPROCESS*      ppEprocess,
+    _Outptr_result_maybenull_ PETHREAD*       ppEthread
 );
 
-/// @brief Inject a ring 3 payload from ring 0 to a remote process using user-mode APC
+/// @brief Kernel routine for the special kernel APC
+/// @param Apc Pointer to the special kernel APC object
+/// @param NormalRoutine Ignored
+/// @param NormalContext Ignored
+/// @param SystemArgument1 Pointer to the regular user-mode APC object pointer
+/// @param SystemArgument2 Ignored
+KKERNEL_ROUTINE kernel_routine;
+
+/// @brief Inject a ring 3 payload from ring 0 to a remote process using APCs
 /// @param wstrImageName Pointer to a null-terminated wide-character string representing the image name of the target process
 /// @param pPayload KVA of the ring 3 payload buffer
 /// @param dwptrPayloadSize Size of the ring 3 payload buffer in bytes
