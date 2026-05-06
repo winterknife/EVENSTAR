@@ -7,7 +7,7 @@
 //
 // Modifications:
 //  2026-04-13	Created
-//  2026-04-28  Updated
+//  2026-05-06  Updated
 // ========================================================================
 
 // ========================================================================
@@ -29,6 +29,8 @@
 #pragma region MACROS
 
 #define SystemProcessInformation 0x05UL
+
+#define ProcessEnableLogging 0x60UL
 
 #pragma endregion
 
@@ -109,6 +111,26 @@ typedef struct _SYSTEM_PROCESS_INFORMATION {
     // SYSTEM_EXTENDED_THREAD_INFORMATION + SYSTEM_PROCESS_INFORMATION_EXTENSION // SystemFullProcessInformation
 } SYSTEM_PROCESS_INFORMATION, *PSYSTEM_PROCESS_INFORMATION;
 
+// nt!_PROCESS_LOGGING_INFORMATION structure definition
+#pragma warning(push)
+#pragma warning(disable: 4201)
+typedef struct _PROCESS_LOGGING_INFORMATION {
+    union {
+        ULONG Flags;
+        struct {
+            ULONG EnableReadVmLogging : 1;               // Enables logging of read operations to process virtual memory.
+            ULONG EnableWriteVmLogging : 1;              // Enables logging of write operations to process virtual memory.
+            ULONG EnableProcessSuspendResumeLogging : 1; // Enables logging of process suspend and resume events.
+            ULONG EnableThreadSuspendResumeLogging : 1;  // Enables logging of thread suspend and resume events.
+            ULONG EnableLocalExecProtectVmLogging : 1;   // Enables logging of local execution protection for virtual memory.
+            ULONG EnableRemoteExecProtectVmLogging : 1;  // Enables logging of remote execution protection for virtual memory.
+            ULONG EnableImpersonationLogging : 1;        // Enables logging of impersonation events.
+            ULONG Reserved : 25;
+        };
+    };
+} PROCESS_LOGGING_INFORMATION, *PPROCESS_LOGGING_INFORMATION;
+#pragma warning(pop)
+
 // nt!_KAPC_ENVIRONMENT structure definition
 typedef enum _KAPC_ENVIRONMENT {
     OriginalApcEnvironment,
@@ -130,6 +152,21 @@ EXTERN_C NTSYSAPI NTSTATUS NTAPI ZwQuerySystemInformation(
     _Out_writes_bytes_opt_(SystemInformationLength) PVOID  SystemInformation,
     _In_                                            ULONG  SystemInformationLength,
     _Out_opt_                                       PULONG ReturnLength
+);
+
+EXTERN_C NTSYSCALLAPI NTSTATUS NTAPI ZwQueryInformationProcess(
+    _In_                                         HANDLE           ProcessHandle,
+    _In_                                         PROCESSINFOCLASS ProcessInformationClass,
+    _Out_writes_bytes_(ProcessInformationLength) PVOID            ProcessInformation,
+    _In_                                         ULONG            ProcessInformationLength,
+    _Out_opt_                                    PULONG           ReturnLength
+);
+
+EXTERN_C NTSYSCALLAPI NTSTATUS NTAPI ZwSetInformationProcess(
+    _In_                                       HANDLE           ProcessHandle,
+    _In_                                       PROCESSINFOCLASS ProcessInformationClass,
+    _In_reads_bytes_(ProcessInformationLength) PVOID            ProcessInformation,
+    _In_                                       ULONG            ProcessInformationLength
 );
 
 EXTERN_C NTSYSCALLAPI NTSTATUS NTAPI ZwProtectVirtualMemory(
@@ -207,7 +244,11 @@ EXTERN_C DECLSPEC_NOINLINE NTSTATUS __stdcall query_process_thread_by_name(
 /// @param SystemArgument2 Ignored
 KKERNEL_ROUTINE kernel_routine;
 
-/// @brief Inject a ring 3 payload from ring 0 to a remote process using APCs
+/// @brief Rundown routine for the special kernel APC
+/// @param Apc Pointer to the special kernel APC object
+KRUNDOWN_ROUTINE rundown_routine;
+
+/// @brief Inject a ring 3 payload from ring 0 into a remote process using APCs
 /// @param wstrImageName Pointer to a null-terminated wide-character string representing the image name of the target process
 /// @param pPayload KVA of the ring 3 payload buffer
 /// @param dwptrPayloadSize Size of the ring 3 payload buffer in bytes

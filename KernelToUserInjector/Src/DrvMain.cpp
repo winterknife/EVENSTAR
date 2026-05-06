@@ -7,7 +7,7 @@
 //
 // Modifications:
 //  2026-04-13	Created
-//  2026-04-20  Updated
+//  2026-05-05  Updated
 // ========================================================================
 
 // ========================================================================
@@ -54,7 +54,7 @@ EXTERN_C __declspec(code_seg("INIT")) NTSTATUS __stdcall DriverEntry(
 
 	// Inject ring 3 shellcode to a user-land process
 	BYTE byarrPayload[] = { 0xCC, 0x90, 0xC3 }; // int3; nop; ret;
-	inject_payload(L"lsass.exe", byarrPayload, sizeof(byarrPayload));
+	inject_payload(L"winlogon.exe", byarrPayload, sizeof(byarrPayload));
 
 	return STATUS_SUCCESS;
 }

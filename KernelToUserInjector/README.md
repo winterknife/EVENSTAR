@@ -2,7 +2,7 @@
 
 ## Version
 
-- `v2.0.0`
+- `v3.0.0`
 
 ## Brief
 
@@ -18,12 +18,12 @@
 
 ```
 [DBG]: +++ KernelToUserInjector.sys Loaded +++
-[DBG]: KernelToUserInjector.sys Built Apr 27 2026 16:54:27
-[DBG]: KernelToUserInjector: DriverObject = FFFFC486721BDAF0
+[DBG]: KernelToUserInjector.sys Built May  6 2026 11:07:01
+[DBG]: KernelToUserInjector: DriverObject = FFFFE508AFD7E2F0
 [DBG]: KernelToUserInjector: RegistryPath = \REGISTRY\MACHINE\SYSTEM\ControlSet001\Services\KernelToUserInjector
-[DBG]: [+] PID of target process: 744
-[DBG]: [+] TID of thread in alertable wait state: 780
-[DBG]: [+] Payload buffer UVA: 0x0000023626550000
+[DBG]: [+] PID of target process: 712
+[DBG]: [+] TID of thread in alertable wait state: 1032
+[DBG]: [+] Payload buffer UVA: 0x0000020B242E0000
 [DBG]: [+] Queued a special kernel APC to the target thread!
 [DBG]: [+] Queued a regular user-mode APC to the target thread!
 [DBG]: --- KernelToUserInjector.sys Unloaded ---
@@ -31,7 +31,7 @@
 
 ## Tested OS Versions
 
-- `Windows 11 21H2 Build 22000 Revision 675 64-bit`
+- `Windows 11 25H2 Build 26200 Revision 8246 64-bit`
 
 ## References
 
@@ -41,3 +41,4 @@
 4. [Bypassing the Microsoft-Windows-Threat-Intelligence Kernel APC Injection Sensor](https://medium.com/@philiptsukerman/bypassing-the-microsoft-windows-threat-intelligence-kernel-apc-injection-sensor-92266433e0b0)
 5. [Blackbone](https://github.com/DarthTon/Blackbone)
 6. [Circumventing Windows Defender ATP's user-mode APC Injection sensor from Kernel-mode](https://rce4fun.blogspot.com/2019/04/circumventing-windows-defender-atps.html)
+7. [KernelInjector](https://github.com/0mWindyBug/KernelInjector)
