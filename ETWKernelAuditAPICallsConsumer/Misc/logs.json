@@ -1,0 +1,149 @@
+[
+    {
+        "Description": "Attempt at opening a handle to a process object",
+        "Timestamp": "2026-09-12T18:00:23.667425Z",
+        "Calling PID": 8548,
+        "Calling TID": 5128,
+        "Target PID": 9724,
+        "Desired Access": "0x1",
+        "NTSTATUS": "0x0",
+        "User Stack": [
+            "ntdll!NtOpenProcess+0x14",
+            "0x7ffe6ff13fa6",
+            "0x7ff7b5e61037",
+            "0x7ff7b5e612bf",
+            "0x7ff7b5e617ef",
+            "0x7ffe7132e957",
+            "ntdll!RtlUserThreadStart+0x2c"
+        ],
+        "Kernel Stack": [
+            "nt!KiExpandKernelStackAndCalloutSwitchStack+0x188",
+            "nt!KeExpandKernelStackAndCalloutInternal+0x33",
+            "nt!EtwpExpandStackAndWalkFrameChain+0x9c",
+            "nt!EtwpGetStackExtendedHeaderItem+0x19d",
+            "nt!EtwpEventWriteFull+0xaae",
+            "nt!EtwWriteEx+0x114",
+            "nt!EtwWrite+0x2c",
+            "nt!PsOpenProcess+0x613",
+            "nt!NtOpenProcess+0x23",
+            "nt!KiSystemServiceCopyEnd+0x25"
+        ]
+    },
+    {
+        "Description": "Attempt at Object Manager symbolic link object creation",
+        "Timestamp": "2026-09-12T18:00:23.667548Z",
+        "Calling PID": 8548,
+        "Calling TID": 5128,
+        "Symlink Name": "\\??\\EtwKernelAuditApiCallsTest",
+        "Target Name": "\\Device\\Null",
+        "Desired Access": "0x1",
+        "NTSTATUS": "0x0",
+        "User Stack": [
+            "ntdll!NtCreateSymbolicLinkObject+0x14",
+            "0x7ff7b5e610f9",
+            "0x7ff7b5e612bf",
+            "0x7ff7b5e617ef",
+            "0x7ffe7132e957",
+            "ntdll!RtlUserThreadStart+0x2c"
+        ],
+        "Kernel Stack": [
+            "nt!KiExpandKernelStackAndCalloutSwitchStack+0x188",
+            "nt!KeExpandKernelStackAndCalloutInternal+0x33",
+            "nt!EtwpExpandStackAndWalkFrameChain+0x9c",
+            "nt!EtwpGetStackExtendedHeaderItem+0x19d",
+            "nt!EtwpEventWriteFull+0xaae",
+            "nt!EtwWriteEx+0x114",
+            "nt!EtwWrite+0x2c",
+            "nt!NtCreateSymbolicLinkObject+0x2bf",
+            "nt!KiSystemServiceCopyEnd+0x25"
+        ]
+    },
+    {
+        "Description": "Attempt at opening a handle to a thread object",
+        "Timestamp": "2026-09-12T18:00:23.667586Z",
+        "Calling PID": 8548,
+        "Calling TID": 5128,
+        "Target PID": 9724,
+        "Target TID": 2180,
+        "Desired Access": "0x18",
+        "NTSTATUS": "0x0",
+        "User Stack": [
+            "ntdll!NtOpenThread+0x14",
+            "0x7ffe6ffcde76",
+            "0x7ff7b5e61125",
+            "0x7ff7b5e612bf",
+            "0x7ff7b5e617ef",
+            "0x7ffe7132e957",
+            "ntdll!RtlUserThreadStart+0x2c"
+        ],
+        "Kernel Stack": [
+            "nt!KiExpandKernelStackAndCalloutSwitchStack+0x188",
+            "nt!KeExpandKernelStackAndCalloutInternal+0x33",
+            "nt!EtwpExpandStackAndWalkFrameChain+0x9c",
+            "nt!EtwpGetStackExtendedHeaderItem+0x19d",
+            "nt!EtwpEventWriteFull+0xaae",
+            "nt!EtwWriteEx+0x114",
+            "nt!EtwWrite+0x2c",
+            "nt!PsOpenThread+0x369",
+            "nt!NtOpenThread+0x23",
+            "nt!KiSystemServiceCopyEnd+0x25"
+        ]
+    },
+    {
+        "Description": "Attempt at thread CONTEXT modification via nt!NtSetContextThread",
+        "Timestamp": "2026-09-12T18:00:23.667680Z",
+        "Calling PID": 8548,
+        "Calling TID": 5128,
+        "NTSTATUS": "0x0",
+        "User Stack": [
+            "ntdll!NtSetContextThread+0x14",
+            "0x7ffe6fffaacb",
+            "0x7ff7b5e6117b",
+            "0x7ff7b5e612bf",
+            "0x7ff7b5e617ef",
+            "0x7ffe7132e957",
+            "ntdll!RtlUserThreadStart+0x2c"
+        ],
+        "Kernel Stack": [
+            "nt!KiExpandKernelStackAndCalloutSwitchStack+0x188",
+            "nt!KeExpandKernelStackAndCalloutInternal+0x33",
+            "nt!EtwpExpandStackAndWalkFrameChain+0x9c",
+            "nt!EtwpGetStackExtendedHeaderItem+0x19d",
+            "nt!EtwpEventWriteFull+0xaae",
+            "nt!EtwWriteEx+0x114",
+            "nt!EtwWrite+0x2c",
+            "nt!PspLogAuditSetContextThreadEvent+0x53",
+            "nt!NtSetContextThread+0x8c",
+            "nt!KiSystemServiceCopyEnd+0x25"
+        ]
+    },
+    {
+        "Description": "Cross-process attempt at process termination",
+        "Timestamp": "2026-09-12T18:00:23.667855Z",
+        "Calling PID": 8548,
+        "Calling TID": 5128,
+        "Target PID": 9724,
+        "NTSTATUS": "0x0",
+        "User Stack": [
+            "ntdll!NtTerminateProcess+0x14",
+            "0x7ffe6ffefa89",
+            "0x7ff7b5e61194",
+            "0x7ff7b5e612bf",
+            "0x7ff7b5e617ef",
+            "0x7ffe7132e957",
+            "ntdll!RtlUserThreadStart+0x2c"
+        ],
+        "Kernel Stack": [
+            "nt!KiExpandKernelStackAndCalloutSwitchStack+0x188",
+            "nt!KeExpandKernelStackAndCalloutInternal+0x33",
+            "nt!EtwpExpandStackAndWalkFrameChain+0x9c",
+            "nt!EtwpGetStackExtendedHeaderItem+0x19d",
+            "nt!EtwpEventWriteFull+0xaae",
+            "nt!EtwWriteEx+0x114",
+            "nt!EtwWrite+0x2c",
+            "nt!PspLogAuditTerminateRemoteProcessEvent+0x87",
+            "nt!NtTerminateProcess+0x16a",
+            "nt!KiSystemServiceCopyEnd+0x25"
+        ]
+    }
+]
