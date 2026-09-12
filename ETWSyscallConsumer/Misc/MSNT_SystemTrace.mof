@@ -1,0 +1,3146 @@
+[dynamic: ToInstance, Guid("{9e814aad-3204-11d2-9a82-006008a86939}")]
+class MSNT_SystemTrace : EventTrace
+{
+	[DefineValues{"EVENT_TRACE_FLAG_PROCESS", "EVENT_TRACE_FLAG_THREAD", "EVENT_TRACE_FLAG_IMAGE_LOAD", "EVENT_TRACE_FLAG_PROCESS_COUNTERS", "EVENT_TRACE_FLAG_CSWITCH", "EVENT_TRACE_FLAG_DPC", "EVENT_TRACE_FLAG_INTERRUPT", "EVENT_TRACE_FLAG_SYSTEMCALL", "EVENT_TRACE_FLAG_DISK_IO", "EVENT_TRACE_FLAG_DISK_FILE_IO", "EVENT_TRACE_FLAG_DISK_IO_INIT", "EVENT_TRACE_FLAG_DISPATCHER", "EVENT_TRACE_FLAG_MEMORY_PAGE_FAULTS", "EVENT_TRACE_FLAG_MEMORY_HARD_FAULTS", "EVENT_TRACE_FLAG_VIRTUAL_ALLOC", "EVENT_TRACE_FLAG_NETWORK_TCPIP", "EVENT_TRACE_FLAG_REGISTRY", "EVENT_TRACE_FLAG_ALPC", "EVENT_TRACE_FLAG_SPLIT_IO", "EVENT_TRACE_FLAG_DRIVER", "EVENT_TRACE_FLAG_PROFILE", "EVENT_TRACE_FLAG_FILE_IO", "EVENT_TRACE_FLAG_FILE_IO_INIT"},
+	 Values{"process", "thread", "img", "proccntr", "cswitch", "dpc", "isr", "syscall", "disk", "file", "diskinit", "dispatcher", "pf", "hf", "virtalloc", "net", "registry", "alpc", "splitio", "driver", "profile", "fileiocompletion", "fileio"},
+	 ValueMap{"0x00000001", "0x00000002", "0x00000004", "0x00000008", "0x00000010", "0x00000020", "0x00000040", "0x00000080", "0x00000100", "0x00000200", "0x00000400", "0x00000800", "0x00001000", "0x00002000", "0x00004000", "0x00010000", "0x00020000", "0x00100000", "0x00200000", "0x00800000", "0x01000000", "0x02000000", "0x04000000"}
+	] uint32 Flags;
+};
+
+[dynamic: ToInstance, Guid("{90cbdc39-4a3e-11d1-84f4-0000f80464e3}"), EventVersion(2)]
+class FileIo_V2 : MSNT_SystemTrace
+{
+};
+
+[dynamic: ToInstance, EventType{37, 38, 39, 40}]
+class FileIo_V2_MapFile : FileIo_V2
+{
+	[WmiDataId(1), pointer, read] uint32 ViewBase;
+	[WmiDataId(2), pointer, read] uint32 FileObject;
+	[WmiDataId(3), format("x"), read] uint64 MiscInfo;
+	[WmiDataId(4), extension("SizeT"), read] object ViewSize;
+	[WmiDataId(5), read] uint32 ProcessId;
+};
+
+[dynamic: ToInstance, EventType{72, 77}]
+class FileIo_V2_DirEnum : FileIo_V2
+{
+	[WmiDataId(1), pointer, read] uint32 IrpPtr;
+	[WmiDataId(2), pointer, read] uint32 TTID;
+	[WmiDataId(3), pointer, read] uint32 FileObject;
+	[WmiDataId(4), pointer, read] uint32 FileKey;
+	[WmiDataId(5), read] uint32 Length;
+	[WmiDataId(6), read] uint32 InfoClass;
+	[WmiDataId(7), read] uint32 FileIndex;
+	[WmiDataId(8), StringTermination("NullTerminated"), format("w"), read] string FileName;
+};
+
+[dynamic: ToInstance, EventType(76)]
+class FileIo_V2_OpEnd : FileIo_V2
+{
+	[WmiDataId(1), pointer, read] uint32 IrpPtr;
+	[WmiDataId(2), pointer, read] uint32 ExtraInfo;
+	[WmiDataId(3), read] uint32 NtStatus;
+};
+
+[dynamic: ToInstance, EventType{65, 66, 73}]
+class FileIo_V2_SimpleOp : FileIo_V2
+{
+	[WmiDataId(1), pointer, read] uint32 IrpPtr;
+	[WmiDataId(2), pointer, read] uint32 TTID;
+	[WmiDataId(3), pointer, read] uint32 FileObject;
+	[WmiDataId(4), pointer, read] uint32 FileKey;
+};
+
+[dynamic: ToInstance, EventType{67, 68}]
+class FileIo_V2_ReadWrite : FileIo_V2
+{
+	[WmiDataId(1), read] uint64 Offset;
+	[WmiDataId(2), pointer, read] uint32 IrpPtr;
+	[WmiDataId(3), pointer, read] uint32 TTID;
+	[WmiDataId(4), pointer, read] uint32 FileObject;
+	[WmiDataId(5), pointer, read] uint32 FileKey;
+	[WmiDataId(6), read] uint32 IoSize;
+	[WmiDataId(7), read] uint32 IoFlags;
+};
+
+[dynamic: ToInstance, EventType{69, 70, 71, 74, 75}]
+class FileIo_V2_Info : FileIo_V2
+{
+	[WmiDataId(1), pointer, read] uint32 IrpPtr;
+	[WmiDataId(2), pointer, read] uint32 TTID;
+	[WmiDataId(3), pointer, read] uint32 FileObject;
+	[WmiDataId(4), pointer, read] uint32 FileKey;
+	[WmiDataId(5), pointer, read] uint32 ExtraInfo;
+	[WmiDataId(6), read] uint32 InfoClass;
+};
+
+[dynamic: ToInstance, EventType{0, 32, 35, 36}]
+class FileIo_V2_Name : FileIo_V2
+{
+	[WmiDataId(1), pointer, read] uint32 FileObject;
+	[WmiDataId(2), StringTermination("NullTerminated"), format("w"), read] string FileName;
+};
+
+[dynamic: ToInstance, EventType(64)]
+class FileIo_V2_Create : FileIo_V2
+{
+	[WmiDataId(1), pointer, read] uint32 IrpPtr;
+	[WmiDataId(2), pointer, read] uint32 TTID;
+	[WmiDataId(3), pointer, read] uint32 FileObject;
+	[WmiDataId(4), read] uint32 CreateOptions;
+	[WmiDataId(5), read] uint32 FileAttributes;
+	[WmiDataId(6), read] uint32 ShareAccess;
+	[WmiDataId(7), StringTermination("NullTerminated"), format("w"), read] string OpenPath;
+};
+
+[dynamic: ToInstance, Guid("{ce1dbfb4-137e-4da6-87b0-3f59aa102cbc}"), EventVersion(0)]
+class PerfInfo_V0 : MSNT_SystemTrace
+{
+};
+
+[dynamic: ToInstance, EventType(34)]
+class Mark_V0 : PerfInfo_V0
+{
+	[WmiDataId(1), StringTermination("NullTerminated"), read] string Message;
+	[WmiDataId(2), read, MAX(1)] char16 Padding;
+};
+
+[dynamic: ToInstance, Guid("{89497f50-effe-4440-8cf2-ce6b1cdcaca7}"), EventVersion(2)]
+class ObTrace : MSNT_SystemTrace
+{
+};
+
+[dynamic: ToInstance, EventType{50, 51}]
+class ObReferenceEvent : ObTrace
+{
+	[WmiDataId(1), format("x"), pointer, read] uint32 Object;
+	[WmiDataId(2), format("x"), read] uint32 Tag;
+	[WmiDataId(3), read] uint32 Count;
+};
+
+[dynamic: ToInstance, EventType{36, 37}]
+class ObTypeEvent : ObTrace
+{
+	[WmiDataId(1), read] uint16 ObjectType;
+	[WmiDataId(2), read] uint16 Reserved;
+	[WmiDataId(3), StringTermination("NullTerminated"), format("w"), read] string TypeName;
+};
+
+[dynamic: ToInstance, EventType{38, 39}]
+class ObHandleRundownEvent : ObTrace
+{
+	[WmiDataId(1), format("x"), pointer, read] uint32 Object;
+	[WmiDataId(2), format("x"), read] uint32 ProcessId;
+	[WmiDataId(3), format("x"), read] uint32 Handle;
+	[WmiDataId(4), read] uint16 ObjectType;
+	[WmiDataId(5), StringTermination("NullTerminated"), format("w"), read] string ObjectName;
+};
+
+[dynamic: ToInstance, EventType{48, 49}]
+class ObObjectEvent : ObTrace
+{
+	[WmiDataId(1), format("x"), pointer, read] uint32 Object;
+	[WmiDataId(2), read] uint16 ObjectType;
+};
+
+[dynamic: ToInstance, EventType(34)]
+class ObHandleDuplicateEvent : ObTrace
+{
+	[WmiDataId(1), format("x"), pointer, read] uint32 Object;
+	[WmiDataId(2), format("x"), read] uint32 SourceHandle;
+	[WmiDataId(3), format("x"), read] uint32 TargetHandle;
+	[WmiDataId(4), format("x"), read] uint32 TargetProcessId;
+	[WmiDataId(5), read] uint16 ObjectType;
+};
+
+[dynamic: ToInstance, EventType{32, 33}]
+class ObHandleEvent : ObTrace
+{
+	[WmiDataId(1), format("x"), pointer, read] uint32 Object;
+	[WmiDataId(2), format("x"), read] uint32 Handle;
+	[WmiDataId(3), read] uint16 ObjectType;
+	[WmiDataId(4), StringTermination("NullTerminated"), format("w"), read] string ObjectName;
+};
+
+[dynamic: ToInstance, Guid("{3d6fa8d3-fe05-11d0-9dda-00c04fd7ba7c}"), EventVersion(2)]
+class PageFault_V2 : MSNT_SystemTrace
+{
+};
+
+[dynamic: ToInstance, EventType(100), EventVersion(3)]
+class PageFault_HeapRangeRundown_V3 : PageFault_V2
+{
+	[WmiDataId(1), pointer, read] uint32 HeapHandle;
+	[WmiDataId(2), format("x"), read] uint32 HRFlags;
+	[WmiDataId(3), format("x"), read] uint32 HRPid;
+	[WmiDataId(4), read] uint32 HRRangeCount;
+	[WmiDataId(5), read] uint32 Reserved;
+};
+
+[dynamic: ToInstance, EventType(32)]
+class PageFault_HardFault : PageFault_V2
+{
+	[WmiDataId(1), extension("WmiTime"), read] object InitialTime;
+	[WmiDataId(2), format("x"), read] uint64 ReadOffset;
+	[WmiDataId(3), pointer, read] uint32 VirtualAddress;
+	[WmiDataId(4), pointer, read] uint32 FileObject;
+	[WmiDataId(5), format("x"), read] uint32 TThreadId;
+	[WmiDataId(6), read] uint32 ByteCount;
+};
+
+[dynamic: ToInstance, EventType{128, 129}]
+class PageFault_VirtualAllocRundown : PageFault_V2
+{
+	[WmiDataId(1), pointer, read] uint32 BaseAddress;
+	[WmiDataId(2), extension("SizeT"), read] object RegionSize;
+	[WmiDataId(3), read] uint32 ProcessId;
+	[WmiDataId(5), extension("SizeT"), read] object CommitSizeInBytes;
+};
+
+[dynamic: ToInstance, EventType{98, 99}]
+class PageFault_VirtualAlloc : PageFault_V2
+{
+	[WmiDataId(1), pointer, read] uint32 BaseAddress;
+	[WmiDataId(2), extension("SizeT"), read] object RegionSize;
+	[WmiDataId(3), read] uint32 ProcessId;
+};
+
+[dynamic: ToInstance, EventType{134}]
+class PageFault_MemReset : PageFault_V2
+{
+	[WmiDataId(1), pointer, read] uint32 BaseAddress;
+	[WmiDataId(2), extension("SizeT"), read] object SizeInBytes;
+};
+
+[dynamic: ToInstance, EventType(100)]
+class PageFault_HeapRangeRundown_V2 : PageFault_V2
+{
+	[WmiDataId(1), pointer, read] uint32 HeapHandle;
+	[WmiDataId(2), format("x"), read] uint32 HRFlags;
+	[WmiDataId(3), format("x"), read] uint32 HRPid;
+	[WmiDataId(4), read] uint32 HRRangeCount;
+};
+
+[dynamic: ToInstance, EventType(104)]
+class PageFault_HeapRangeDestroy : PageFault_V2
+{
+	[WmiDataId(1), pointer, read] uint32 HeapHandle;
+};
+
+[dynamic: ToInstance, EventType{10, 11, 12, 13, 14, 15}]
+class PageFault_TypeGroup1 : PageFault_V2
+{
+	[WmiDataId(1), pointer, read] uint32 VirtualAddress;
+	[WmiDataId(2), pointer, read] uint32 ProgramCounter;
+};
+
+[dynamic: ToInstance, EventType(105)]
+class PageFault_ImageLoadBacked : PageFault_V2
+{
+	[WmiDataId(1), pointer, read] uint32 FileObject;
+	[WmiDataId(2), format("x"), read] uint32 DeviceChar;
+	[WmiDataId(3), format("x"), read] uint16 FileChar;
+	[WmiDataId(4), format("x"), read] uint16 LoadFlags;
+};
+
+[dynamic: ToInstance, EventType{102, 103}]
+class PageFault_HeapRangeTypeGroup : PageFault_V2
+{
+	[WmiDataId(1), pointer, read] uint32 HeapHandle;
+	[WmiDataId(2), pointer, read] uint32 HRAddress;
+	[WmiDataId(3), extension("SizeT"), read] object HRSize;
+};
+
+[dynamic: ToInstance, EventType(101)]
+class PageFault_HeapRangeCreate : PageFault_V2
+{
+	[WmiDataId(1), pointer, read] uint32 HeapHandle;
+	[WmiDataId(2), extension("SizeT"), read] object FirstRangeSize;
+	[WmiDataId(3), format("x"), read] uint32 HRCreateFlags;
+};
+
+[dynamic: ToInstance, EventType{127}]
+class PageFault_VirtualRotate : PageFault_V2
+{
+	[WmiDataId(1), pointer, read] uint32 BaseAddress;
+	[WmiDataId(2), extension("SizeT"), read] object SizeInBytes;
+};
+
+[dynamic: ToInstance, Guid("{ce1dbfb4-137e-4da6-87b0-3f59aa102cbc}"), EventVersion(2)]
+class PerfInfo_V2 : MSNT_SystemTrace
+{
+};
+
+[dynamic: ToInstance, EventType(108)]
+class FinalizeKTimer2 : PerfInfo_V2
+{
+	[WmiDataId(1), pointer, read] uint32 Timer;
+	[WmiDataId(2), pointer, read] uint32 DisableCallback;
+	[WmiDataId(3), pointer, read] uint32 DisableContext;
+};
+
+[dynamic: ToInstance, EventType{96, 97}]
+class WDF_ISR : PerfInfo_V2
+{
+	[WmiDataId(1), pointer, read] uint32 Routine;
+};
+
+[dynamic: ToInstance, EventType{98}]
+class WDF_DPC : PerfInfo_V2
+{
+	[WmiDataId(1), pointer, read] uint32 Routine;
+};
+
+[dynamic: ToInstance, EventType(92)]
+class ISR_Unexpected : PerfInfo_V2
+{
+	[WmiDataId(1), read] uint16 Vector;
+};
+
+[dynamic: ToInstance, EventType(123)]
+class ContextRegistersARM64 : PerfInfo_V2
+{
+	[WmiDataId(1), read] uint32 Cpsr;
+	[WmiDataId(2), read] uint64 X0;
+	[WmiDataId(3), read] uint64 X1;
+	[WmiDataId(4), read] uint64 X2;
+	[WmiDataId(5), read] uint64 X3;
+	[WmiDataId(6), read] uint64 X4;
+	[WmiDataId(7), read] uint64 X5;
+	[WmiDataId(8), read] uint64 X6;
+	[WmiDataId(9), read] uint64 X7;
+	[WmiDataId(10), read] uint64 X8;
+	[WmiDataId(11), read] uint64 X9;
+	[WmiDataId(12), read] uint64 X10;
+	[WmiDataId(13), read] uint64 X11;
+	[WmiDataId(14), read] uint64 X12;
+	[WmiDataId(15), read] uint64 X13;
+	[WmiDataId(16), read] uint64 X14;
+	[WmiDataId(17), read] uint64 X15;
+	[WmiDataId(18), read] uint64 X16;
+	[WmiDataId(19), read] uint64 X17;
+	[WmiDataId(20), read] uint64 X18;
+	[WmiDataId(21), read] uint64 X19;
+	[WmiDataId(22), read] uint64 X20;
+	[WmiDataId(23), read] uint64 X21;
+	[WmiDataId(24), read] uint64 X22;
+	[WmiDataId(25), read] uint64 X23;
+	[WmiDataId(26), read] uint64 X24;
+	[WmiDataId(27), read] uint64 X25;
+	[WmiDataId(28), read] uint64 X26;
+	[WmiDataId(29), read] uint64 X27;
+	[WmiDataId(30), read] uint64 X28;
+	[WmiDataId(31), read] uint64 Fp;
+	[WmiDataId(32), read] uint64 Lr;
+	[WmiDataId(33), read] uint64 Sp;
+	[WmiDataId(34), read] uint64 Pc;
+};
+
+[dynamic: ToInstance, EventType(46)]
+class SampledProfile : PerfInfo_V2
+{
+	[WmiDataId(1), pointer, read] uint32 InstructionPointer;
+	[WmiDataId(2), read] uint32 ThreadId;
+	[WmiDataId(3), read] uint16 Count;
+	[WmiDataId(4), read] uint16 Reserved;
+};
+
+[dynamic: ToInstance, EventType(106)]
+class CancelKTimer2 : PerfInfo_V2
+{
+	[WmiDataId(1), pointer, read] uint32 Timer;
+};
+
+[dynamic: ToInstance, EventType(47)]
+class PmcCounterProfile : PerfInfo_V2
+{
+	[WmiDataId(1), pointer, read] uint32 InstructionPointer;
+	[WmiDataId(2), read] uint32 ThreadId;
+	[WmiDataId(3), read] uint16 ProfileSource;
+	[WmiDataId(4), read] uint16 Reserved;
+};
+
+[dynamic: ToInstance, EventType(48)]
+class PmcCounterConfig_V2 : PerfInfo_V2
+{
+	[WmiDataId(1), read] uint32 CounterCount;
+	[WmiDataId(2), StringTermination("NullTerminated"), format("w"), WmiSizeIs("CounterCount"), read] string CounterName;
+};
+
+[dynamic: ToInstance, EventType(52)]
+class SysCallExit : PerfInfo_V2
+{
+	[WmiDataId(1), format("x"), read] uint32 SysCallNtStatus;
+};
+
+[dynamic: ToInstance, EventType(50)]
+class ISR_MSI : PerfInfo_V2
+{
+	[WmiDataId(1), extension("WmiTime"), read] object InitialTime;
+	[WmiDataId(2), pointer, read] uint32 Routine;
+	[WmiDataId(3), read] uint8 ReturnValue;
+	[WmiDataId(4), read] uint16 Vector;
+	[WmiDataId(5), read] uint8 Reserved;
+	[WmiDataId(6), read] uint32 MessageNumber;
+};
+
+[dynamic: ToInstance, EventType(107)]
+class DisableKTimer2 : PerfInfo_V2
+{
+	[WmiDataId(1), pointer, read] uint32 Timer;
+	[WmiDataId(2), pointer, read] uint32 DisableCallback;
+	[WmiDataId(3), pointer, read] uint32 DisableContext;
+	[WmiDataId(4), read] uint8 TimerFlags;
+};
+
+[dynamic: ToInstance, EventType{104, 105}]
+class SetOrExpireKTimer2 : PerfInfo_V2
+{
+	[WmiDataId(1), read] uint64 DueTime;
+	[WmiDataId(2), read] uint64 MaximumDueTime;
+	[WmiDataId(3), read] uint64 Period;
+	[WmiDataId(4), pointer, read] uint32 Timer;
+	[WmiDataId(5), pointer, read] uint32 Callback;
+	[WmiDataId(6), pointer, read] uint32 CallbackContext;
+	[WmiDataId(7), read] uint8 TimerFlags;
+};
+
+[dynamic: ToInstance, EventType{67, 95}]
+class ISR : PerfInfo_V2
+{
+	[WmiDataId(1), extension("WmiTime"), read] object InitialTime;
+	[WmiDataId(2), pointer, read] uint32 Routine;
+	[WmiDataId(3), read] uint8 ReturnValue;
+	[WmiDataId(4), read] uint16 Vector;
+	[WmiDataId(5), read] uint8 Reserved;
+};
+
+[dynamic: ToInstance, EventType(49)]
+class PmcCounterCorruption_V2 : PerfInfo_V2
+{
+	[WmiDataId(1), read] uint32 ProcessorNumber;
+	[WmiDataId(2), read] uint32 CounterCount;
+	[WmiDataId(3), WmiSizeIs("CounterCount"), read] object CounterStatus;
+};
+
+[dynamic: ToInstance, EventType(51)]
+class SysCallEnter : PerfInfo_V2
+{
+	[WmiDataId(1), pointer, read] uint32 SysCallAddress;
+};
+
+[dynamic: ToInstance, EventType{93, 94}]
+class IoTimerEvent : PerfInfo_V2
+{
+	[WmiDataId(1), pointer, read] uint32 DeviceObject;
+	[WmiDataId(2), pointer, read] uint32 TimerRoutine;
+};
+
+[dynamic: ToInstance, EventType{103}]
+class WDF_WorkItem : PerfInfo_V2
+{
+	[WmiDataId(1), pointer, read] uint32 Routine;
+};
+
+[dynamic: ToInstance, EventType(122)]
+class ContextRegistersAMD64 : PerfInfo_V2
+{
+	[WmiDataId(1), read] uint64 Rip;
+	[WmiDataId(2), read] uint64 Rax;
+	[WmiDataId(3), read] uint64 Rcx;
+	[WmiDataId(4), read] uint64 Rdx;
+	[WmiDataId(5), read] uint64 Rbx;
+	[WmiDataId(6), read] uint64 Rsp;
+	[WmiDataId(7), read] uint64 Rbp;
+	[WmiDataId(8), read] uint64 Rsi;
+	[WmiDataId(9), read] uint64 Rdi;
+	[WmiDataId(10), read] uint64 R8;
+	[WmiDataId(11), read] uint64 R9;
+	[WmiDataId(12), read] uint64 R10;
+	[WmiDataId(13), read] uint64 R11;
+	[WmiDataId(14), read] uint64 R12;
+	[WmiDataId(15), read] uint64 R13;
+	[WmiDataId(16), read] uint64 R14;
+	[WmiDataId(17), read] uint64 R15;
+};
+
+[dynamic: ToInstance, EventType{58}]
+class DebuggerEnabled : PerfInfo_V2
+{
+};
+
+[dynamic: ToInstance, EventType{72, 73, 74}]
+class SampledProfileInterval_V2 : PerfInfo_V2
+{
+	[WmiDataId(1), read] uint32 Source;
+	[WmiDataId(2), read] uint32 NewInterval;
+	[WmiDataId(3), read] uint32 OldInterval;
+};
+
+[dynamic: ToInstance, EventType(114)]
+class HV_Hypercall : PerfInfo_V2
+{
+	[WmiDataId(1), read] uint32 CallCode;
+	[WmiDataId(2), read] uint8 IsFast;
+	[WmiDataId(3), read] uint8 IsNested;
+};
+
+[dynamic: ToInstance, EventType{66, 68, 69, 70}]
+class DPC : PerfInfo_V2
+{
+	[WmiDataId(1), extension("WmiTime"), read] object InitialTime;
+	[WmiDataId(2), pointer, read] uint32 Routine;
+};
+
+[dynamic: ToInstance, EventType{75, 76}]
+class SpinLockConfig_V2 : PerfInfo_V2
+{
+	[WmiDataId(1), read] uint32 SpinLockSpinThreshold;
+	[WmiDataId(2), read] uint32 SpinLockContentionSampleRate;
+	[WmiDataId(3), read] uint32 SpinLockAcquireSampleRate;
+};
+
+[dynamic: ToInstance, Guid("{bf3a50c5-a9c9-4988-a005-2df0b7c80f80}"), EventVersion(2)]
+class UdpIp : MSNT_SystemTrace
+{
+};
+
+[dynamic: ToInstance, EventType(17)]
+class UdpIp_Fail : UdpIp
+{
+	[WmiDataId(1), read] uint16 Proto;
+	[WmiDataId(2), read] uint16 FailureCode;
+};
+
+[dynamic: ToInstance, EventType{26, 27}]
+class UdpIp_TypeGroup2 : UdpIp
+{
+	[WmiDataId(1), read] uint32 PID;
+	[WmiDataId(2), read] uint32 size;
+	[WmiDataId(3), extension("IPAddrV6"), read] object daddr;
+	[WmiDataId(4), extension("IPAddrV6"), read] object saddr;
+	[WmiDataId(5), extension("Port"), read] object dport;
+	[WmiDataId(6), extension("Port"), read] object sport;
+	[WmiDataId(7), read] uint32 seqnum;
+	[WmiDataId(8), PointerType, read] uint32 connid;
+};
+
+[dynamic: ToInstance, EventType{10, 11}]
+class UdpIp_TypeGroup1 : UdpIp
+{
+	[WmiDataId(1), read] uint32 PID;
+	[WmiDataId(2), read] uint32 size;
+	[WmiDataId(3), extension("IPAddrV4"), read] object daddr;
+	[WmiDataId(4), extension("IPAddrV4"), read] object saddr;
+	[WmiDataId(5), extension("Port"), read] object dport;
+	[WmiDataId(6), extension("Port"), read] object sport;
+	[WmiDataId(7), read] uint32 seqnum;
+	[WmiDataId(8), PointerType, read] uint32 connid;
+};
+
+[dynamic: ToInstance, Guid("{3d6fa8d1-fe05-11d0-9dda-00c04fd7ba7c}"), EventVersion(2)]
+class Thread_V2 : MSNT_SystemTrace
+{
+};
+
+[dynamic: ToInstance, EventType(67)]
+class AutoBoostClearFloor : Thread_V2
+{
+	[WmiDataId(1), pointer, read] uint32 LockAddress;
+	[WmiDataId(2), format("x"), read] uint32 ThreadId;
+	[WmiDataId(3), read] uint32 BoostBitmap;
+};
+
+[dynamic: ToInstance, EventType(57)]
+class WorkerThread : Thread_V2
+{
+	[WmiDataId(1), format("x"), read] uint32 TThreadId;
+	[WmiDataId(2), read] uint64 StartTime;
+	[WmiDataId(3), pointer, read] uint32 ThreadRoutine;
+};
+
+[dynamic: ToInstance, EventType(62)]
+class KernelQueueEnqueue : Thread_V2
+{
+	[WmiDataId(1), pointer, read] uint32 Entry;
+	[WmiDataId(2), format("x"), read] uint32 ThreadId;
+};
+
+[dynamic: ToInstance, EventType(36)]
+class CSwitch_V2 : Thread_V2
+{
+	[WmiDataId(1), format("x"), read] uint32 NewThreadId;
+	[WmiDataId(2), format("x"), read] uint32 OldThreadId;
+	[WmiDataId(3), read] sint8 NewThreadPriority;
+	[WmiDataId(4), read] sint8 OldThreadPriority;
+	[WmiDataId(5), read] uint8 PreviousCState;
+	[WmiDataId(6), read] sint8 SpareByte;
+	[WmiDataId(7), read] sint8 OldThreadWaitReason;
+	[WmiDataId(8), read] sint8 OldThreadWaitMode;
+	[WmiDataId(9), read] sint8 OldThreadState;
+	[WmiDataId(10), read] sint8 OldThreadWaitIdealProcessor;
+	[WmiDataId(11), format("x"), read] uint32 NewThreadWaitTime;
+	[WmiDataId(12), read] uint32 Reserved;
+};
+
+[dynamic: ToInstance, EventType(69)]
+class SubProcessTagChanged : Thread_V2
+{
+	[WmiDataId(1), format("x"), read] uint32 OldTag;
+	[WmiDataId(2), format("x"), read] uint32 NewTag;
+};
+
+[dynamic: ToInstance, EventType(41)]
+class SpinLock : Thread_V2
+{
+	[WmiDataId(1), pointer, read] uint32 SpinLockAddress;
+	[WmiDataId(2), pointer, read] uint32 CallerAddress;
+	[WmiDataId(3), read] uint64 AcquireTime;
+	[WmiDataId(4), read] uint64 ReleaseTime;
+	[WmiDataId(5), read] uint32 WaitTimeInCycles;
+	[WmiDataId(6), read] uint32 SpinCount;
+	[WmiDataId(7), read] uint32 ThreadId;
+	[WmiDataId(8), read] uint32 InterruptCount;
+	[WmiDataId(9), read] uint8 Irql;
+	[WmiDataId(10), read] uint8 AcquireDepth;
+	[WmiDataId(11), read] uint8 Flag;
+	[WmiDataId(12), read, MAX(5)] uint8 Reserved;
+};
+
+[dynamic: ToInstance, EventType(61)]
+class ThreadMigration : Thread_V2
+{
+	[WmiDataId(1), format("x"), read] uint32 ThreadId;
+	[WmiDataId(2), read] uint16 SourceProcessorIndex;
+	[WmiDataId(3), read] uint16 TargetProcessorIndex;
+	[WmiDataId(4), read] uint8 Priority;
+	[WmiDataId(5), read] boolean IdealProcessorAdjust;
+	[WmiDataId(6), read] uint16 OldIdealProcessorIndex;
+};
+
+[dynamic: ToInstance, EventType(63)]
+class KernelQueueDequeue : Thread_V2
+{
+	[WmiDataId(1), format("x"), read] uint32 ThreadId;
+	[WmiDataId(2), read] uint32 EntryCount;
+	[WmiDataId(3), WmiSizeIs("EntryCount"), pointer, read] uint32 Entries;
+};
+
+[dynamic: ToInstance, EventType(66)]
+class AutoBoostSetFloor : Thread_V2
+{
+	[WmiDataId(1), pointer, read] uint32 Lock;
+	[WmiDataId(2), format("x"), read] uint32 ThreadId;
+	[WmiDataId(3), read] uint8 NewCpuPriorityFloor;
+	[WmiDataId(4), read] uint8 OldCpuPriority;
+	[WmiDataId(5), read] uint8 IoPriorities;
+	[WmiDataId(6), read] uint8 BoostFlags;
+};
+
+[dynamic: ToInstance, EventType(53)]
+class ThreadAffinity : Thread_V2
+{
+	[WmiDataId(1), pointer, read] uint32 Affinity;
+	[WmiDataId(2), format("x"), read] uint32 ThreadId;
+	[WmiDataId(3), read] uint16 Group;
+	[WmiDataId(4), read] uint16 Reserved;
+};
+
+[dynamic: ToInstance, EventType{64, 65}]
+class WorkerThread_StartStop_V2 : Thread_V2
+{
+	[WmiDataId(1), pointer, read] uint32 CallbackRoutine;
+};
+
+[dynamic: ToInstance, EventType(72)]
+class ThreadSetName : Thread_V2
+{
+	[WmiDataId(1), format("x"), read] uint32 ProcessId;
+	[WmiDataId(2), format("x"), read] uint32 ThreadId;
+	[WmiDataId(3), StringTermination("NullTerminated"), format("w"), read] string ThreadName;
+};
+
+[dynamic: ToInstance, EventType(37)]
+class CompCS : Thread_V2
+{
+};
+
+[dynamic: ToInstance, EventType(68)]
+class AutoBoostEntryExhaustion : Thread_V2
+{
+	[WmiDataId(1), pointer, read] uint32 LockAddress;
+	[WmiDataId(2), format("x"), read] uint32 ThreadId;
+};
+
+[dynamic: ToInstance, EventType(50)]
+class ReadyThread : Thread_V2
+{
+	[WmiDataId(1), format("x"), read] uint32 TThreadId;
+	[WmiDataId(2), read] sint8 AdjustReason;
+	[WmiDataId(3), read] sint8 AdjustIncrement;
+	[WmiDataId(4), read] sint8 Flag;
+	[WmiDataId(5), read] sint8 Reserved;
+};
+
+[dynamic: ToInstance, EventType(60)]
+class AntiStarvationBoost : Thread_V2
+{
+	[WmiDataId(1), format("x"), read] uint32 ThreadId;
+	[WmiDataId(2), read] uint16 ProcessorIndex;
+	[WmiDataId(3), read] uint8 Priority;
+	[WmiDataId(4), read] uint8 Reserved;
+};
+
+[dynamic: ToInstance, EventType{1, 2, 3, 4}]
+class Thread_V2_TypeGroup1 : Thread_V2
+{
+	[WmiDataId(1), format("x"), read] uint32 ProcessId;
+	[WmiDataId(2), format("x"), read] uint32 TThreadId;
+	[WmiDataId(3), pointer, read] uint32 StackBase;
+	[WmiDataId(4), pointer, read] uint32 StackLimit;
+	[WmiDataId(5), pointer, read] uint32 UserStackBase;
+	[WmiDataId(6), pointer, read] uint32 UserStackLimit;
+	[WmiDataId(7), pointer, read] uint32 StartAddr;
+	[WmiDataId(8), pointer, read] uint32 Win32StartAddr;
+	[WmiDataId(9), pointer, read] uint32 TebBase;
+	[WmiDataId(10), format("x"), read] uint32 SubProcessTag;
+};
+
+[dynamic: ToInstance, Guid("{bf3a50c5-a9c9-4988-a005-2df0b7c80f80}"), EventVersion(0)]
+class UdpIp_V0 : MSNT_SystemTrace
+{
+};
+
+[dynamic: ToInstance, EventType{10, 11}]
+class UdpIp_V0_TypeGroup1 : UdpIp_V0
+{
+	[WmiDataId(1), pointer, read] uint32 context;
+	[WmiDataId(2), extension("IPAddr"), read] object saddr;
+	[WmiDataId(3), extension("Port"), read] object sport;
+	[WmiDataId(4), read] uint16 size;
+	[WmiDataId(5), extension("IPAddr"), read] object daddr;
+	[WmiDataId(6), extension("Port"), read] object dport;
+	[WmiDataId(7), read] uint16 dsize;
+};
+
+[dynamic: ToInstance, Guid("{def2fe46-7bd6-4b80-bd94-f57fe20d0ce3}"), EventVersion(2)]
+class StackWalk : MSNT_SystemTrace
+{
+};
+
+[dynamic: ToInstance, EventType{34, 35, 36}]
+class StackWalk_TypeGroup1 : StackWalk
+{
+	[WmiDataId(1), pointer, read] uint32 key;
+	[WmiDataId(2), pointer, read, MAX(192)] uint32 StackFrame;
+};
+
+[dynamic: ToInstance, EventType{37, 38}]
+class StackWalk_Key : StackWalk
+{
+	[WmiDataId(1), read] uint64 EventTimeStamp;
+	[WmiDataId(2), format("x"), read] uint32 StackProcess;
+	[WmiDataId(3), read] uint32 StackThread;
+	[WmiDataId(4), pointer, read] uint32 StackKey;
+};
+
+[dynamic: ToInstance, EventType(32)]
+class StackWalk_Event : StackWalk
+{
+	[WmiDataId(1), read] uint64 EventTimeStamp;
+	[WmiDataId(2), format("x"), read] uint32 StackProcess;
+	[WmiDataId(3), read] uint32 StackThread;
+	[WmiDataId(4), pointer, read] uint32 Stack1;
+	[WmiDataId(5), pointer, read] uint32 Stack2;
+	[WmiDataId(6), pointer, read] uint32 Stack3;
+	[WmiDataId(7), pointer, read] uint32 Stack4;
+	[WmiDataId(8), pointer, read] uint32 Stack5;
+	[WmiDataId(9), pointer, read] uint32 Stack6;
+	[WmiDataId(10), pointer, read] uint32 Stack7;
+	[WmiDataId(11), pointer, read] uint32 Stack8;
+	[WmiDataId(12), pointer, read] uint32 Stack9;
+	[WmiDataId(13), pointer, read] uint32 Stack10;
+	[WmiDataId(14), pointer, read] uint32 Stack11;
+	[WmiDataId(15), pointer, read] uint32 Stack12;
+	[WmiDataId(16), pointer, read] uint32 Stack13;
+	[WmiDataId(17), pointer, read] uint32 Stack14;
+	[WmiDataId(18), pointer, read] uint32 Stack15;
+	[WmiDataId(19), pointer, read] uint32 Stack16;
+	[WmiDataId(20), pointer, read] uint32 Stack17;
+	[WmiDataId(21), pointer, read] uint32 Stack18;
+	[WmiDataId(22), pointer, read] uint32 Stack19;
+	[WmiDataId(23), pointer, read] uint32 Stack20;
+	[WmiDataId(24), pointer, read] uint32 Stack21;
+	[WmiDataId(25), pointer, read] uint32 Stack22;
+	[WmiDataId(26), pointer, read] uint32 Stack23;
+	[WmiDataId(27), pointer, read] uint32 Stack24;
+	[WmiDataId(28), pointer, read] uint32 Stack25;
+	[WmiDataId(29), pointer, read] uint32 Stack26;
+	[WmiDataId(30), pointer, read] uint32 Stack27;
+	[WmiDataId(31), pointer, read] uint32 Stack28;
+	[WmiDataId(32), pointer, read] uint32 Stack29;
+	[WmiDataId(33), pointer, read] uint32 Stack30;
+	[WmiDataId(34), pointer, read] uint32 Stack31;
+	[WmiDataId(35), pointer, read] uint32 Stack32;
+};
+
+[dynamic: ToInstance, Guid("{3d6fa8d4-fe05-11d0-9dda-00c04fd7ba7c}"), EventVersion(1)]
+class DiskIo_V1 : MSNT_SystemTrace
+{
+};
+
+[dynamic: ToInstance, EventType(35)]
+class V1_DriverMajorFunctionReturn : DiskIo_V1
+{
+	[WmiDataId(1), read] uint32 UniqMatchId;
+	[WmiDataId(2), pointer, read] uint32 Irp;
+};
+
+[dynamic: ToInstance, EventType(52)]
+class V1_DriverCompleteRequest : DiskIo_V1
+{
+	[WmiDataId(1), pointer, read] uint32 RoutineAddr;
+	[WmiDataId(2), pointer, read] uint32 Irp;
+	[WmiDataId(3), read] uint32 UniqMatchId;
+};
+
+[dynamic: ToInstance, EventType(53)]
+class V1_DriverCompleteRequestReturn : DiskIo_V1
+{
+	[WmiDataId(1), pointer, read] uint32 Irp;
+	[WmiDataId(2), read] uint32 UniqMatchId;
+};
+
+[dynamic: ToInstance, EventType{10, 11}]
+class DiskIo_V1_TypeGroup1 : DiskIo_V1
+{
+	[WmiDataId(1), read] uint32 DiskNumber;
+	[WmiDataId(2), format("x"), read] uint32 IrpFlags;
+	[WmiDataId(3), read] uint32 TransferSize;
+	[WmiDataId(4), read] uint32 ResponseTime;
+	[WmiDataId(5), read] uint64 ByteOffset;
+	[WmiDataId(6), pointer, read] uint32 FileObject;
+	[WmiDataId(7), read] uint64 HighResResponseTime;
+};
+
+[dynamic: ToInstance, EventType(34)]
+class V1_DriverMajorFunctionCall : DiskIo_V1
+{
+	[WmiDataId(1), read] uint32 UniqMatchId;
+	[WmiDataId(2), pointer, read] uint32 RoutineAddr;
+	[WmiDataId(3), pointer, read] uint32 Irp;
+	[WmiDataId(4), read] uint32 MajorFunction;
+	[WmiDataId(5), read] uint32 MinorFunction;
+	[WmiDataId(6), pointer, read] uint32 FileObject;
+};
+
+[dynamic: ToInstance, Guid("{9aec974b-5b8e-4118-9b92-3186d8002ce5}"), EventVersion(2)]
+class UmsEvent : MSNT_SystemTrace
+{
+};
+
+[dynamic: ToInstance, EventType(36)]
+class UmsContextSwitch : UmsEvent
+{
+	[WmiDataId(1), format("x"), read] uint32 ScheduledThreadId;
+	[WmiDataId(2), read] uint32 SwitchCount;
+	[WmiDataId(3), read] uint32 KernelYieldCount;
+	[WmiDataId(4), read] uint32 MixedYieldCount;
+	[WmiDataId(5), read] uint32 YieldCount;
+};
+
+[dynamic: ToInstance, EventType(33)]
+class UmsDirectedSwitchEnd : UmsEvent
+{
+	[WmiDataId(1), format("x"), read] uint32 ProcessId;
+	[WmiDataId(2), format("x"), read] uint32 ScheduledThreadId;
+	[WmiDataId(3), format("x"), read] uint32 PrimaryThreadId;
+	[WmiDataId(4), format("x"), read] uint32 SwitchFlags;
+};
+
+[dynamic: ToInstance, EventType(34)]
+class UmsScheduledPark : UmsEvent
+{
+	[WmiDataId(1), format("x"), read] uint32 ProcessId;
+	[WmiDataId(2), format("x"), read] uint32 ScheduledThreadId;
+	[WmiDataId(3), format("x"), read] uint32 ParkFlags;
+};
+
+[dynamic: ToInstance, EventType(35)]
+class UmsDisassociate : UmsEvent
+{
+	[WmiDataId(1), format("x"), read] uint32 ProcessId;
+	[WmiDataId(2), format("x"), read] uint32 ScheduledThreadId;
+	[WmiDataId(3), format("x"), read] uint32 PrimaryThreadId;
+	[WmiDataId(4), format("x"), read] uint32 UmsApcControlFlags;
+	[WmiDataId(5), format("x"), read] uint32 Status;
+};
+
+[dynamic: ToInstance, EventType(32)]
+class UmsDirectedSwitchStart : UmsEvent
+{
+	[WmiDataId(1), format("x"), read] uint32 ProcessId;
+	[WmiDataId(2), format("x"), read] uint32 ScheduledThreadId;
+	[WmiDataId(3), format("x"), read] uint32 PrimaryThreadId;
+	[WmiDataId(4), format("x"), read] uint32 SwitchFlags;
+};
+
+[dynamic: ToInstance, Guid("{ce1dbfb4-137e-4da6-87b0-3f59aa102cbc}"), EventVersion(3)]
+class PerfInfo : MSNT_SystemTrace
+{
+};
+
+[dynamic: ToInstance, EventType{73, 74}]
+class SampledProfileInterval_V3 : PerfInfo
+{
+	[WmiDataId(1), read] uint32 Source;
+	[WmiDataId(2), read] uint32 NewInterval;
+	[WmiDataId(3), read] uint32 OldInterval;
+	[WmiDataId(4), StringTermination("NullTerminated"), format("w"), read] string SourceName;
+};
+
+[dynamic: ToInstance, EventType{75, 76}]
+class SpinLockConfig_V3 : PerfInfo
+{
+	[WmiDataId(1), read] uint32 SpinLockSpinThreshold;
+	[WmiDataId(2), read] uint32 SpinLockContentionSampleRate;
+	[WmiDataId(3), read] uint32 SpinLockAcquireSampleRate;
+	[WmiDataId(4), read] uint32 SpinLockHoldThreshold;
+};
+
+[dynamic: ToInstance, Guid("{9a280ac0-c8e0-11d1-84e2-00c04fb998a2}"), EventVersion(1)]
+class TcpIp_V1 : MSNT_SystemTrace
+{
+};
+
+[dynamic: ToInstance, EventType(17)]
+class TcpIp_V1_Fail : TcpIp_V1
+{
+	[WmiDataId(1), read] uint32 Proto;
+};
+
+[dynamic: ToInstance, EventType{18, 19, 20, 21, 22}]
+class TcpIp_V1_TypeGroup3 : TcpIp_V1
+{
+	[WmiDataId(1), read] uint32 PID;
+	[WmiDataId(2), read] uint32 size;
+	[WmiDataId(3), extension("IPAddr"), read] object daddr;
+	[WmiDataId(4), extension("IPAddr"), read] object saddr;
+	[WmiDataId(5), extension("Port"), read] object dport;
+	[WmiDataId(6), extension("Port"), read] object sport;
+	[WmiDataId(7), PointerType, read] uint32 connid;
+	[WmiDataId(8), read] uint32 seqnum;
+};
+
+[dynamic: ToInstance, EventType(10)]
+class TcpIp_V1_Send : TcpIp_V1
+{
+	[WmiDataId(1), read] uint32 PID;
+	[WmiDataId(2), read] uint32 size;
+	[WmiDataId(3), extension("IPAddr"), read] object daddr;
+	[WmiDataId(4), extension("IPAddr"), read] object saddr;
+	[WmiDataId(5), extension("Port"), read] object dport;
+	[WmiDataId(6), extension("Port"), read] object sport;
+	[WmiDataId(7), read] uint32 startime;
+	[WmiDataId(8), read] uint32 endtime;
+	[WmiDataId(9), PointerType, read] uint32 connid;
+	[WmiDataId(10), read] uint32 seqnum;
+};
+
+[dynamic: ToInstance, EventType{13, 14, 16}]
+class TcpIp_V1_TypeGroup1 : TcpIp_V1
+{
+	[WmiDataId(1), read] uint32 PID;
+	[WmiDataId(2), read] uint32 size;
+	[WmiDataId(3), extension("IPAddr"), read] object daddr;
+	[WmiDataId(4), extension("IPAddr"), read] object saddr;
+	[WmiDataId(5), extension("Port"), read] object dport;
+	[WmiDataId(6), extension("Port"), read] object sport;
+	[WmiDataId(7), PointerType, read] uint32 connid;
+	[WmiDataId(8), read] uint32 seqnum;
+};
+
+[dynamic: ToInstance, EventType{12, 15}]
+class TcpIp_V1_TypeGroup2 : TcpIp_V1
+{
+	[WmiDataId(1), read] uint32 PID;
+	[WmiDataId(2), read] uint32 size;
+	[WmiDataId(3), extension("IPAddr"), read] object daddr;
+	[WmiDataId(4), extension("IPAddr"), read] object saddr;
+	[WmiDataId(5), extension("Port"), read] object dport;
+	[WmiDataId(6), extension("Port"), read] object sport;
+	[WmiDataId(7), read] uint16 mss;
+	[WmiDataId(8), read] uint16 sackopt;
+	[WmiDataId(9), read] uint16 tsopt;
+	[WmiDataId(10), read] uint16 wsopt;
+	[WmiDataId(11), read] uint32 rcvwin;
+	[WmiDataId(12), read] sint16 rcvwinscale;
+	[WmiDataId(13), read] sint16 sndwinscale;
+	[WmiDataId(14), PointerType, read] uint32 connid;
+	[WmiDataId(15), read] uint32 seqnum;
+};
+
+[dynamic: ToInstance, EventType(11)]
+class TcpIp_V1_Receive : TcpIp_V1
+{
+	[WmiDataId(1), read] uint32 PID;
+	[WmiDataId(2), read] uint32 size;
+	[WmiDataId(3), extension("IPAddr"), read] object daddr;
+	[WmiDataId(4), extension("IPAddr"), read] object saddr;
+	[WmiDataId(5), extension("Port"), read] object dport;
+	[WmiDataId(6), extension("Port"), read] object sport;
+	[WmiDataId(7), PointerType, read] uint32 connid;
+	[WmiDataId(8), read] uint32 seqnum;
+};
+
+[dynamic: ToInstance, Guid("{68fdd900-4a3e-11d1-84f4-0000f80464e3}"), EventVersion(2)]
+class EventTraceEvent : MSNT_SystemTrace
+{
+};
+
+[dynamic: ToInstance, EventType{66}]
+class Header_BuildInfo_TypeGroup : EventTraceEvent
+{
+	[WmiDataId(1), StringTermination("NullTerminated"), read] string BuildString;
+};
+
+[dynamic: ToInstance, EventType{64}]
+class Header_DbgIdRSDS_TypeGroup : EventTraceEvent
+{
+	[WmiDataId(1), extension("GUID"), read] object Guid;
+	[WmiDataId(2), read] uint32 Age;
+	[WmiDataId(3), StringTermination("NullTerminated"), read] string PdbName;
+};
+
+[dynamic: ToInstance, EventType{80}, EventVersion(2)]
+class Header_PartitionInfoExtensionV2_TypeGroup : EventTraceEvent
+{
+	[WmiDataId(1), read] uint16 EventVersion;
+	[WmiDataId(2), read] uint16 Reserved;
+	[WmiDataId(3), read] uint32 PartitionType;
+	[WmiDataId(4), read] sint64 QpcOffsetFromRoot;
+	[WmiDataId(5), StringTermination("NullTerminated"), format("w"), read] string PartitionId;
+	[WmiDataId(6), StringTermination("NullTerminated"), format("w"), read] string ParentId;
+};
+
+[dynamic: ToInstance, EventType{5, 32}]
+class Header_Extension_TypeGroup : EventTraceEvent
+{
+	[WmiDataId(1), format("x"), read] uint32 GroupMask1;
+	[WmiDataId(2), format("x"), read] uint32 GroupMask2;
+	[WmiDataId(3), format("x"), read] uint32 GroupMask3;
+	[WmiDataId(4), format("x"), read] uint32 GroupMask4;
+	[WmiDataId(5), format("x"), read] uint32 GroupMask5;
+	[WmiDataId(6), format("x"), read] uint32 GroupMask6;
+	[WmiDataId(7), format("x"), read] uint32 GroupMask7;
+	[WmiDataId(8), format("x"), read] uint32 GroupMask8;
+	[WmiDataId(9), format("x"), read] uint32 KernelEventVersion;
+};
+
+[dynamic: ToInstance, EventType{82}]
+class Header_LastDroppedTimes_TypeGroup : EventTraceEvent
+{
+	[WmiDataId(1), read] uint32 TimeStampCount;
+	[WmiDataId(2), read] uint32 Padding;
+	[WmiDataId(3), WmiSizeIs("TimeStampCount"), read] uint64 TimeStamp;
+};
+
+[dynamic: ToInstance, EventType{80}, EventVersion(0)]
+class Header_PartitionInfoExtension_TypeGroup : EventTraceEvent
+{
+	[WmiDataId(1), read] uint16 EventVersion;
+	[WmiDataId(2), read] uint16 Reserved;
+	[WmiDataId(3), read] uint32 PartitionType;
+	[WmiDataId(4), read] sint64 QpcOffsetFromRoot;
+	[WmiDataId(5), extension("GUID"), read] object PartitionId;
+	[WmiDataId(6), extension("GUID"), read] object ParentId;
+};
+
+[dynamic: ToInstance, EventType(0)]
+class EventTrace_Header : EventTraceEvent
+{
+	[WmiDataId(1), read] uint32 BufferSize;
+	[WmiDataId(2), read] uint32 Version;
+	[WmiDataId(3), read] uint32 ProviderVersion;
+	[WmiDataId(4), read] uint32 NumberOfProcessors;
+	[WmiDataId(5), read] uint64 EndTime;
+	[WmiDataId(6), read] uint32 TimerResolution;
+	[WmiDataId(7), read] uint32 MaxFileSize;
+	[WmiDataId(8), format("x"), read] uint32 LogFileMode;
+	[WmiDataId(9), read] uint32 BuffersWritten;
+	[WmiDataId(10), read] uint32 StartBuffers;
+	[WmiDataId(11), read] uint32 PointerSize;
+	[WmiDataId(12), read] uint32 EventsLost;
+	[WmiDataId(13), read] uint32 CPUSpeed;
+	[WmiDataId(14), pointer, read] uint32 LoggerName;
+	[WmiDataId(15), pointer, read] uint32 LogFileName;
+	[WmiDataId(16), extension("NoPrint"), read, MAX(176)] uint8 TimeZoneInformation;
+	[WmiDataId(17), read] uint64 BootTime;
+	[WmiDataId(18), read] uint64 PerfFreq;
+	[WmiDataId(19), read] uint64 StartTime;
+	[WmiDataId(20), format("x"), read] uint32 ReservedFlags;
+	[WmiDataId(21), read] uint32 BuffersLost;
+	[WmiDataId(22), StringTermination("NullTerminated"), format("w"), read] string SessionNameString;
+	[WmiDataId(23), StringTermination("NullTerminated"), format("w"), read] string LogFileNameString;
+};
+
+[dynamic: ToInstance, EventType{67}]
+class Header_ProviderBinaryPath_TypeGroup : EventTraceEvent
+{
+	[WmiDataId(1), read] uint32 GuidCount;
+	[WmiDataId(2), extension("GUID"), WmiSizeIs("GuidCount"), read] object Guid;
+	[WmiDataId(3), StringTermination("NullTerminated"), format("w"), read] string BinaryPath;
+};
+
+[dynamic: ToInstance, EventType(8)]
+class RDComplete : EventTraceEvent
+{
+};
+
+[dynamic: ToInstance, Guid("{f8f10121-b617-4a56-868b-9df1b27fe32c}"), EventVersion(0)]
+class MMCSSTrace : MSNT_SystemTrace
+{
+};
+
+[dynamic: ToInstance, EventType(34)]
+class MMCSSEvent : MMCSSTrace
+{
+	[WmiDataId(1), format("x"), read] uint32 ScheduledPID;
+	[WmiDataId(2), format("x"), read] uint32 ScheduledTID;
+	[WmiDataId(3), read] uint32 SchedulingPriority;
+	[WmiDataId(4), read] uint32 TaskIndex;
+};
+
+[dynamic: ToInstance, EventType(35)]
+class MMCSSWakeup : MMCSSTrace
+{
+	[WmiDataId(1), format("x"), read] uint32 Reason;
+};
+
+[dynamic: ToInstance, EventType{32, 33, 36, 37}]
+class MMCSS_TypeGroup : MMCSSTrace
+{
+};
+
+[dynamic: ToInstance, Guid("{01853a65-418f-4f36-aefc-dc0f1d2fd235}"), EventVersion(1)]
+class SystemConfig_V1 : MSNT_SystemTrace
+{
+};
+
+[dynamic: ToInstance, EventType(12)]
+class SystemConfig_V1_LogDisk : SystemConfig_V1
+{
+	[WmiDataId(1), read] uint64 StartOffset;
+	[WmiDataId(2), read] uint64 PartitionSize;
+	[WmiDataId(3), read] uint32 DiskNumber;
+	[WmiDataId(4), read] uint32 Size;
+	[WmiDataId(5), read] uint32 DriveType;
+	[WmiDataId(6), read, MAX(4)] char16 DriveLetterString;
+	[WmiDataId(7), read] uint32 Pad1;
+	[WmiDataId(8), read] uint32 PartitionNumber;
+	[WmiDataId(9), read] uint32 SectorsPerCluster;
+	[WmiDataId(10), read] uint32 BytesPerSector;
+	[WmiDataId(11), read] uint32 Pad2;
+	[WmiDataId(12), read] sint64 NumberOfFreeClusters;
+	[WmiDataId(13), read] sint64 TotalNumberOfClusters;
+	[WmiDataId(14), read, MAX(16)] char16 FileSystem;
+	[WmiDataId(15), read] uint32 VolumeExt;
+};
+
+[dynamic: ToInstance, EventType(11)]
+class SystemConfig_V1_PhyDisk : SystemConfig_V1
+{
+	[WmiDataId(1), read] uint32 DiskNumber;
+	[WmiDataId(2), read] uint32 BytesPerSector;
+	[WmiDataId(3), read] uint32 SectorsPerTrack;
+	[WmiDataId(4), read] uint32 TracksPerCylinder;
+	[WmiDataId(5), read] uint64 Cylinders;
+	[WmiDataId(6), read] uint32 SCSIPort;
+	[WmiDataId(7), read] uint32 SCSIPath;
+	[WmiDataId(8), read] uint32 SCSITarget;
+	[WmiDataId(9), read] uint32 SCSILun;
+	[WmiDataId(10), read, MAX(256)] char16 Manufacturer;
+	[WmiDataId(11), read] uint32 PartitionCount;
+	[WmiDataId(12), read] uint8 WriteCacheEnabled;
+	[WmiDataId(13), read] uint8 Pad;
+	[WmiDataId(14), read, MAX(3)] char16 BootDriveLetter;
+	[WmiDataId(15), read, MAX(2)] char16 Spare;
+};
+
+[dynamic: ToInstance, EventType(21)]
+class SystemConfig_V1_IRQ : SystemConfig_V1
+{
+	[WmiDataId(1), format("x"), read] uint64 IRQAffinity;
+	[WmiDataId(2), read] uint32 IRQNum;
+	[WmiDataId(3), read] uint32 DeviceDescriptionLen;
+	[WmiDataId(4), StringTermination("NullTerminated"), format("w"), read] string DeviceDescription;
+};
+
+[dynamic: ToInstance, EventType(10)]
+class SystemConfig_V1_CPU : SystemConfig_V1
+{
+	[WmiDataId(1), read] uint32 MHz;
+	[WmiDataId(2), read] uint32 NumberOfProcessors;
+	[WmiDataId(3), read] uint32 MemSize;
+	[WmiDataId(4), read] uint32 PageSize;
+	[WmiDataId(5), read] uint32 AllocationGranularity;
+	[WmiDataId(6), read, MAX(256)] char16 ComputerName;
+	[WmiDataId(7), read, MAX(132)] char16 DomainName;
+	[WmiDataId(8), pointer, read] uint32 HyperThreadingFlag;
+};
+
+[dynamic: ToInstance, EventType(16)]
+class SystemConfig_V1_Power : SystemConfig_V1
+{
+	[WmiDataId(1), read] uint8 S1;
+	[WmiDataId(2), read] uint8 S2;
+	[WmiDataId(3), read] uint8 S3;
+	[WmiDataId(4), read] uint8 S4;
+	[WmiDataId(5), read] uint8 S5;
+	[WmiDataId(6), read] uint8 Pad1;
+	[WmiDataId(7), read] uint8 Pad2;
+	[WmiDataId(8), read] uint8 Pad3;
+};
+
+[dynamic: ToInstance, EventType(14)]
+class SystemConfig_V1_Video : SystemConfig_V1
+{
+	[WmiDataId(1), read] uint32 MemorySize;
+	[WmiDataId(2), read] uint32 XResolution;
+	[WmiDataId(3), read] uint32 YResolution;
+	[WmiDataId(4), read] uint32 BitsPerPixel;
+	[WmiDataId(5), read] uint32 VRefresh;
+	[WmiDataId(6), read, MAX(256)] char16 ChipType;
+	[WmiDataId(7), read, MAX(256)] char16 DACType;
+	[WmiDataId(8), read, MAX(256)] char16 AdapterString;
+	[WmiDataId(9), read, MAX(256)] char16 BiosString;
+	[WmiDataId(10), read, MAX(256)] char16 DeviceId;
+	[WmiDataId(11), format("x"), read] uint32 StateFlags;
+};
+
+[dynamic: ToInstance, EventType(15)]
+class SystemConfig_V1_Services : SystemConfig_V1
+{
+	[WmiDataId(1), read, MAX(34)] char16 ServiceName;
+	[WmiDataId(2), read, MAX(256)] char16 DisplayName;
+	[WmiDataId(3), read, MAX(34)] char16 ProcessName;
+	[WmiDataId(4), read] uint32 ProcessId;
+};
+
+[dynamic: ToInstance, EventType(22)]
+class SystemConfig_V1_PnP : SystemConfig_V1
+{
+	[WmiDataId(1), read] uint32 IDLength;
+	[WmiDataId(2), read] uint32 DescriptionLength;
+	[WmiDataId(3), read] uint32 FriendlyNameLength;
+	[WmiDataId(4), StringTermination("NullTerminated"), format("w"), read] string DeviceID;
+	[WmiDataId(5), StringTermination("NullTerminated"), format("w"), read] string DeviceDescription;
+	[WmiDataId(6), StringTermination("NullTerminated"), format("w"), read] string FriendlyName;
+};
+
+[dynamic: ToInstance, EventType(13)]
+class SystemConfig_V1_NIC : SystemConfig_V1
+{
+	[WmiDataId(1), read, MAX(256)] char16 NICName;
+	[WmiDataId(2), read] uint32 Index;
+	[WmiDataId(3), read] uint32 PhysicalAddrLen;
+	[WmiDataId(4), read, MAX(8)] char16 PhysicalAddr;
+	[WmiDataId(5), read] uint32 Size;
+	[WmiDataId(6), read] sint32 IpAddress;
+	[WmiDataId(7), read] sint32 SubnetMask;
+	[WmiDataId(8), read] sint32 DhcpServer;
+	[WmiDataId(9), read] sint32 Gateway;
+	[WmiDataId(10), read] sint32 PrimaryWinsServer;
+	[WmiDataId(11), read] sint32 SecondaryWinsServer;
+	[WmiDataId(12), read] sint32 DnsServer1;
+	[WmiDataId(13), read] sint32 DnsServer2;
+	[WmiDataId(14), read] sint32 DnsServer3;
+	[WmiDataId(15), read] sint32 DnsServer4;
+	[WmiDataId(16), read] uint32 Data;
+};
+
+[dynamic: ToInstance, Guid("{ae53722e-c863-11d2-8659-00c04fa321a1}"), EventVersion(2)]
+class Registry : MSNT_SystemTrace
+{
+};
+
+[dynamic: ToInstance, EventType(40)]
+class Registry_HiveDirty : Registry
+{
+	[WmiDataId(1), pointer, read] uint32 Hive;
+	[WmiDataId(2), StringTermination("NullTerminated"), format("w"), read] string LinkPath;
+	[WmiDataId(3), read] uint32 DirtyReason;
+};
+
+[dynamic: ToInstance, EventType(35)]
+class Registry_Config : Registry
+{
+	[WmiDataId(1), read] uint32 CurrentControlSet;
+};
+
+[dynamic: ToInstance, EventType(37)]
+class Registry_HiveDestroy : Registry
+{
+	[WmiDataId(1), pointer, read] uint32 Hive;
+	[WmiDataId(2), StringTermination("NullTerminated"), format("w"), read] string FileName;
+	[WmiDataId(3), StringTermination("NullTerminated"), format("w"), read] string Path;
+};
+
+[dynamic: ToInstance, EventType(34)]
+class Registry_Counters : Registry
+{
+	[WmiDataId(1), read] uint64 Counter1;
+	[WmiDataId(2), read] uint64 Counter2;
+	[WmiDataId(3), read] uint64 Counter3;
+	[WmiDataId(4), read] uint64 Counter4;
+	[WmiDataId(5), read] uint64 Counter5;
+	[WmiDataId(6), read] uint64 Counter6;
+	[WmiDataId(7), read] uint64 Counter7;
+	[WmiDataId(8), read] uint64 Counter8;
+	[WmiDataId(9), read] uint64 Counter9;
+	[WmiDataId(10), read] uint64 Counter10;
+	[WmiDataId(11), read] uint64 Counter11;
+};
+
+[dynamic: ToInstance,
+ EventType{10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29}
+]
+class Registry_TypeGroup1 : Registry
+{
+	[WmiDataId(1), read] sint64 InitialTime;
+	[WmiDataId(2), read] uint32 Status;
+	[WmiDataId(3), read] uint32 Index;
+	[WmiDataId(4), pointer, read] uint32 KeyHandle;
+	[WmiDataId(5), StringTermination("NullTerminated"), format("w"), read] string KeyName;
+};
+
+[dynamic: ToInstance, EventType(36)]
+class Registry_HiveInitialize : Registry
+{
+	[WmiDataId(1), pointer, read] uint32 Hive;
+	[WmiDataId(2), read] uint32 OperationType;
+	[WmiDataId(3), read] uint32 PoolTag;
+	[WmiDataId(4), read] uint32 Size;
+	[WmiDataId(5), StringTermination("NullTerminated"), format("w"), read] string FileName;
+};
+
+[dynamic: ToInstance, EventType{30, 31, 32}]
+class Registry_TxR : Registry
+{
+	[WmiDataId(1), extension("GUID"), read] object TxrGUID;
+	[WmiDataId(2), read] uint32 Status;
+	[WmiDataId(3), read] uint32 UowCount;
+	[WmiDataId(4), read] uint64 OperationTime;
+	[WmiDataId(5), StringTermination("NullTerminated"), format("w"), read] string Hive;
+};
+
+[dynamic: ToInstance, EventType(39)]
+class Registry_HiveRundown : Registry
+{
+	[WmiDataId(1), read] uint64 Size;
+	[WmiDataId(2), pointer, read] uint32 Hive;
+	[WmiDataId(3), read] uint32 LoadedKeyCount;
+	[WmiDataId(4), StringTermination("NullTerminated"), format("w"), read] string FileName;
+	[WmiDataId(5), StringTermination("NullTerminated"), format("w"), read] string LinkPath;
+};
+
+[dynamic: ToInstance, EventType(48)]
+class Registry_ChangeNotification : Registry
+{
+	[WmiDataId(1), pointer, read] uint32 Notification;
+	[WmiDataId(2), pointer, read] uint32 KeyHandle;
+	[WmiDataId(3), read] uint8 Type;
+	[WmiDataId(4), read] uint8 WatchSubtree;
+	[WmiDataId(5), read] uint8 Primary;
+};
+
+[dynamic: ToInstance, EventType(38)]
+class Registry_HiveLink : Registry
+{
+	[WmiDataId(1), pointer, read] uint32 Hive;
+	[WmiDataId(2), StringTermination("NullTerminated"), format("w"), read] string Path;
+};
+
+[dynamic: ToInstance, Guid("{3d6fa8d3-fe05-11d0-9dda-00c04fd7ba7c}"), EventVersion(3)]
+class PageFault : MSNT_SystemTrace
+{
+};
+
+[dynamic: ToInstance, EventType(100), EventVersion(4)]
+class PageFault_HeapRangeRundown_V4 : PageFault
+{
+	[WmiDataId(1), pointer, read] uint32 HeapHandle;
+	[WmiDataId(2), format("x"), read] uint32 HRFlags;
+	[WmiDataId(3), format("x"), read] uint32 HRPid;
+	[WmiDataId(4), read] uint32 HRRangeCount;
+	[WmiDataId(5), read] uint64 HRHeapTag;
+};
+
+[dynamic: ToInstance, Guid("{68fdd900-4a3e-11d1-84f4-0000f80464e3}"), EventVersion(0)]
+class EventTraceEvent_V0 : MSNT_SystemTrace
+{
+};
+
+[dynamic: ToInstance, EventType(8)]
+class RDComplete_V0 : EventTraceEvent_V0
+{
+};
+
+[dynamic: ToInstance, EventType{5, 32}]
+class Header_Extension_V0_TypeGroup : EventTraceEvent_V0
+{
+	[WmiDataId(1), format("x"), read] uint32 GroupMask1;
+	[WmiDataId(2), format("x"), read] uint32 GroupMask2;
+	[WmiDataId(3), format("x"), read] uint32 GroupMask3;
+	[WmiDataId(4), format("x"), read] uint32 GroupMask4;
+	[WmiDataId(5), format("x"), read] uint32 GroupMask5;
+	[WmiDataId(6), format("x"), read] uint32 GroupMask6;
+	[WmiDataId(7), format("x"), read] uint32 GroupMask7;
+	[WmiDataId(8), format("x"), read] uint32 GroupMask8;
+};
+
+[dynamic: ToInstance, EventType(0)]
+class EventTrace_V0_Header : EventTraceEvent_V0
+{
+	[WmiDataId(1), read] uint32 BufferSize;
+	[WmiDataId(2), read] uint32 Version;
+	[WmiDataId(3), read] uint32 ProviderVersion;
+	[WmiDataId(4), read] uint32 NumberOfProcessors;
+	[WmiDataId(5), read] uint64 EndTime;
+	[WmiDataId(6), read] uint32 TimerResolution;
+	[WmiDataId(7), read] uint32 MaxFileSize;
+	[WmiDataId(8), format("x"), read] uint32 LogFileMode;
+	[WmiDataId(9), read] uint32 BuffersWritten;
+	[WmiDataId(10), read] uint32 StartBuffers;
+	[WmiDataId(11), read] uint32 PointerSize;
+	[WmiDataId(12), read] uint32 EventsLost;
+	[WmiDataId(13), read] uint32 CPUSpeed;
+	[WmiDataId(14), pointer, read] uint32 LoggerName;
+	[WmiDataId(15), pointer, read] uint32 LogFileName;
+	[WmiDataId(16), extension("NoPrint"), read, MAX(176)] uint8 TimeZoneInformation;
+	[WmiDataId(17), read] uint64 BootTime;
+	[WmiDataId(18), read] uint64 PerfFreq;
+	[WmiDataId(19), read] uint64 StartTime;
+	[WmiDataId(20), format("x"), read] uint32 ReservedFlags;
+	[WmiDataId(21), read] uint32 BuffersLost;
+	[WmiDataId(22), StringTermination("NullTerminated"), format("w"), read] string SessionNameString;
+	[WmiDataId(23), StringTermination("NullTerminated"), format("w"), read] string LogFileNameString;
+};
+
+[dynamic: ToInstance, Guid("{3d6fa8d0-fe05-11d0-9dda-00c04fd7ba7c}"), EventVersion(1)]
+class Process_V1 : MSNT_SystemTrace
+{
+};
+
+[dynamic: ToInstance, EventType{1, 2, 3, 4}]
+class Process_V1_TypeGroup1 : Process_V1
+{
+	[WmiDataId(1), pointer, read] uint32 PageDirectoryBase;
+	[WmiDataId(2), format("x"), read] uint32 ProcessId;
+	[WmiDataId(3), format("x"), read] uint32 ParentId;
+	[WmiDataId(4), read] uint32 SessionId;
+	[WmiDataId(5), read] sint32 ExitStatus;
+	[WmiDataId(6), extension("Sid"), read] object UserSID;
+	[WmiDataId(7), StringTermination("NullTerminated"), read] string ImageFileName;
+};
+
+[dynamic: ToInstance, Guid("{ce1dbfb4-137e-4da6-87b0-3f59aa102cbc}"), EventVersion(1)]
+class PerfInfo_V1 : MSNT_SystemTrace
+{
+};
+
+[dynamic: ToInstance, EventType(46)]
+class SampledProfile_V1 : PerfInfo_V1
+{
+	[WmiDataId(1), pointer, read] uint32 InstructionPointer;
+	[WmiDataId(2), read] uint32 ThreadId;
+	[WmiDataId(3), read] uint16 Count;
+};
+
+[dynamic: ToInstance, EventType{68, 69}]
+class DPC_V1 : PerfInfo_V1
+{
+	[WmiDataId(1), extension("WmiTime"), read] object InitialTime;
+	[WmiDataId(2), pointer, read] uint32 Routine;
+};
+
+[dynamic: ToInstance, EventType{67, 95}]
+class ISR_V1 : PerfInfo_V1
+{
+	[WmiDataId(1), extension("WmiTime"), read] object InitialTime;
+	[WmiDataId(2), pointer, read] uint32 Routine;
+	[WmiDataId(3), read] uint32 ReturnValue;
+};
+
+[dynamic: ToInstance, Guid("{2cb15d1d-5fc1-11d2-abe1-00a0c911f518}"), EventVersion(2)]
+class Image_V2 : MSNT_SystemTrace
+{
+};
+
+[dynamic: ToInstance, EventType(33)]
+class KernelImageBase : Image_V2
+{
+	[WmiDataId(1), pointer, read] uint32 ImageBase;
+};
+
+[dynamic: ToInstance, EventType{128, 129, 130, 131, 132, 133, 134, 135}]
+class LoaderBasicEvent : Image_V2
+{
+};
+
+[dynamic: ToInstance, EventType{160, 161, 162, 163, 164}]
+class LoaderCodedEvent : Image_V2
+{
+	[WmiDataId(1), format("x"), read] uint64 BaseAddress;
+	[WmiDataId(2), format("x"), read] uint8 ErrorOpcode;
+	[WmiDataId(3), read] sint8 Code;
+	[WmiDataId(4), StringTermination("NullTerminated"), format("w"), read] string String;
+};
+
+[dynamic: ToInstance, EventType{144, 145, 146, 147, 148, 149, 150}]
+class LoaderBaseEvent : Image_V2
+{
+	[WmiDataId(1), format("x"), read] uint64 BaseAddress;
+};
+
+[dynamic: ToInstance, EventType{10, 2, 3, 4}]
+class Image_Load_V2 : Image_V2
+{
+	[WmiDataId(1), pointer, read] uint32 ImageBase;
+	[WmiDataId(2), pointer, read] uint32 ImageSize;
+	[WmiDataId(3), read] uint32 ProcessId;
+	[WmiDataId(4), read] uint32 ImageChecksum;
+	[WmiDataId(5), read] uint32 TimeDateStamp;
+	[WmiDataId(6), read] uint32 Reserved0;
+	[WmiDataId(7), pointer, read] uint32 DefaultBase;
+	[WmiDataId(8), read] uint32 Reserved1;
+	[WmiDataId(9), read] uint32 Reserved2;
+	[WmiDataId(10), read] uint32 Reserved3;
+	[WmiDataId(11), read] uint32 Reserved4;
+	[WmiDataId(12), StringTermination("NullTerminated"), format("w"), read] string FileName;
+};
+
+[dynamic: ToInstance, EventType(34)]
+class HypercallPage : Image_V2
+{
+	[WmiDataId(1), pointer, read] uint32 HypercallPageVa;
+};
+
+[dynamic: ToInstance, Guid("{bf3a50c5-a9c9-4988-a005-2df0b7c80f80}"), EventVersion(1)]
+class UdpIp_V1 : MSNT_SystemTrace
+{
+};
+
+[dynamic: ToInstance, EventType{10, 11}]
+class UdpIp_V1_TypeGroup1 : UdpIp_V1
+{
+	[WmiDataId(1), read] uint32 PID;
+	[WmiDataId(2), read] uint32 size;
+	[WmiDataId(3), extension("IPAddr"), read] object daddr;
+	[WmiDataId(4), extension("IPAddr"), read] object saddr;
+	[WmiDataId(5), extension("Port"), read] object dport;
+	[WmiDataId(6), extension("Port"), read] object sport;
+};
+
+[dynamic: ToInstance, Guid("{ae53722e-c863-11d2-8659-00c04fa321a1}"), EventVersion(0)]
+class Registry_V0 : MSNT_SystemTrace
+{
+};
+
+[dynamic: ToInstance, EventType{10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21}]
+class Registry_V0_TypeGroup1 : Registry_V0
+{
+	[WmiDataId(1), pointer, read] uint32 Status;
+	[WmiDataId(2), pointer, read] uint32 KeyHandle;
+	[WmiDataId(3), read] sint64 ElapsedTime;
+	[WmiDataId(4), StringTermination("NullTerminated"), format("w"), read] string KeyName;
+};
+
+[dynamic: ToInstance, Guid("{3d6fa8d0-fe05-11d0-9dda-00c04fd7ba7c}"), EventVersion(0)]
+class Process_V0 : MSNT_SystemTrace
+{
+};
+
+[dynamic: ToInstance, EventType{1, 2, 3, 4}]
+class Process_V0_TypeGroup1 : Process_V0
+{
+	[WmiDataId(1), pointer, read] uint32 ProcessId;
+	[WmiDataId(2), pointer, read] uint32 ParentId;
+	[WmiDataId(3), extension("Sid"), read] object UserSID;
+	[WmiDataId(4), StringTermination("NullTerminated"), read] string ImageFileName;
+};
+
+[dynamic: ToInstance, Guid("{90cbdc39-4a3e-11d1-84f4-0000f80464e3}"), EventVersion(3)]
+class FileIo : MSNT_SystemTrace
+{
+};
+
+[dynamic: ToInstance, EventType{67, 68}]
+class FileIo_ReadWrite : FileIo
+{
+	[WmiDataId(1), read] uint64 Offset;
+	[WmiDataId(2), pointer, read] uint32 IrpPtr;
+	[WmiDataId(3), pointer, read] uint32 FileObject;
+	[WmiDataId(4), pointer, read] uint32 FileKey;
+	[WmiDataId(5), read] uint32 TTID;
+	[WmiDataId(6), read] uint32 IoSize;
+	[WmiDataId(7), read] uint32 IoFlags;
+};
+
+[dynamic: ToInstance, EventType(64)]
+class FileIo_Create : FileIo
+{
+	[WmiDataId(1), pointer, read] uint32 IrpPtr;
+	[WmiDataId(2), pointer, read] uint32 FileObject;
+	[WmiDataId(3), read] uint32 TTID;
+	[WmiDataId(4), read] uint32 CreateOptions;
+	[WmiDataId(5), read] uint32 FileAttributes;
+	[WmiDataId(6), read] uint32 ShareAccess;
+	[WmiDataId(7), StringTermination("NullTerminated"), format("w"), read] string OpenPath;
+};
+
+[dynamic: ToInstance, EventType{96, 97}]
+class FltIoInit : FileIo
+{
+	[WmiDataId(1), pointer, read] uint32 RoutineAddr;
+	[WmiDataId(2), pointer, read] uint32 FileObject;
+	[WmiDataId(3), pointer, read] uint32 FileContext;
+	[WmiDataId(4), pointer, read] uint32 IrpPtr;
+	[WmiDataId(5), pointer, read] uint32 CallbackDataPtr;
+	[WmiDataId(6), read] uint32 MajorFunction;
+};
+
+[dynamic: ToInstance, EventType{100, 101}]
+class FltIoFailure : FileIo
+{
+	[WmiDataId(1), pointer, read] uint32 RoutineAddr;
+	[WmiDataId(2), pointer, read] uint32 FileObject;
+	[WmiDataId(3), pointer, read] uint32 FileContext;
+	[WmiDataId(4), pointer, read] uint32 IrpPtr;
+	[WmiDataId(5), pointer, read] uint32 CallbackDataPtr;
+	[WmiDataId(6), read] uint32 MajorFunction;
+	[WmiDataId(7), format("x"), read] uint32 Status;
+};
+
+[dynamic: ToInstance, EventType{0, 32, 35, 36}]
+class FileIo_Name : FileIo
+{
+	[WmiDataId(1), pointer, read] uint32 FileObject;
+	[WmiDataId(2), StringTermination("NullTerminated"), format("w"), read] string FileName;
+};
+
+[dynamic: ToInstance, EventType{69, 70, 71, 74, 75}]
+class FileIo_Info : FileIo
+{
+	[WmiDataId(1), pointer, read] uint32 IrpPtr;
+	[WmiDataId(2), pointer, read] uint32 FileObject;
+	[WmiDataId(3), pointer, read] uint32 FileKey;
+	[WmiDataId(4), pointer, read] uint32 ExtraInfo;
+	[WmiDataId(5), read] uint32 TTID;
+	[WmiDataId(6), read] uint32 InfoClass;
+};
+
+[dynamic: ToInstance, EventType{65, 66, 73}]
+class FileIo_SimpleOp : FileIo
+{
+	[WmiDataId(1), pointer, read] uint32 IrpPtr;
+	[WmiDataId(2), pointer, read] uint32 FileObject;
+	[WmiDataId(3), pointer, read] uint32 FileKey;
+	[WmiDataId(4), read] uint32 TTID;
+};
+
+[dynamic: ToInstance, EventType{98, 99}]
+class FltIoCompletion : FileIo
+{
+	[WmiDataId(1), extension("WmiTime"), read] object InitialTime;
+	[WmiDataId(2), pointer, read] uint32 RoutineAddr;
+	[WmiDataId(3), pointer, read] uint32 FileObject;
+	[WmiDataId(4), pointer, read] uint32 FileContext;
+	[WmiDataId(5), pointer, read] uint32 IrpPtr;
+	[WmiDataId(6), pointer, read] uint32 CallbackDataPtr;
+	[WmiDataId(7), read] uint32 MajorFunction;
+};
+
+[dynamic: ToInstance, EventType{72, 77}]
+class FileIo_DirEnum : FileIo
+{
+	[WmiDataId(1), pointer, read] uint32 IrpPtr;
+	[WmiDataId(2), pointer, read] uint32 FileObject;
+	[WmiDataId(3), pointer, read] uint32 FileKey;
+	[WmiDataId(4), read] uint32 TTID;
+	[WmiDataId(5), read] uint32 Length;
+	[WmiDataId(6), read] uint32 InfoClass;
+	[WmiDataId(7), read] uint32 FileIndex;
+	[WmiDataId(8), StringTermination("NullTerminated"), format("w"), read] string FileName;
+};
+
+[dynamic: ToInstance, EventType{79, 80, 81}]
+class FileIo_PathOperation : FileIo
+{
+	[WmiDataId(1), pointer, read] uint32 IrpPtr;
+	[WmiDataId(2), pointer, read] uint32 FileObject;
+	[WmiDataId(3), pointer, read] uint32 FileKey;
+	[WmiDataId(4), pointer, read] uint32 ExtraInfo;
+	[WmiDataId(5), read] uint32 TTID;
+	[WmiDataId(6), read] uint32 InfoClass;
+	[WmiDataId(7), StringTermination("NullTerminated"), format("w"), read] string FileName;
+};
+
+[dynamic: ToInstance, EventType(76)]
+class FileIo_OpEnd : FileIo
+{
+	[WmiDataId(1), pointer, read] uint32 IrpPtr;
+	[WmiDataId(2), pointer, read] uint32 ExtraInfo;
+	[WmiDataId(3), read] uint32 NtStatus;
+};
+
+[dynamic: ToInstance, Guid("{d837ca92-12b9-44a5-ad6a-3a65b3578aa8}"), EventVersion(2), locale("MS\0x409")]
+class SplitIo : MSNT_SystemTrace
+{
+};
+
+[dynamic: ToInstance, EventType(32), locale("MS\0x409")]
+class SplitIo_Info : SplitIo
+{
+	[WmiDataId(1), pointer, read] uint32 ParentIrp;
+	[WmiDataId(2), pointer, read] uint32 ChildIrp;
+};
+
+[dynamic: ToInstance, Guid("{99134383-5248-43fc-834b-529454e75df3}"), EventVersion(2)]
+class LBR_V2 : MSNT_SystemTrace
+{
+};
+
+[dynamic: ToInstance, EventType(32)]
+class LbrRecord_V2 : LBR_V2
+{
+	[WmiDataId(1), read] uint64 TimeStamp;
+	[WmiDataId(2), read] uint32 ProcessId;
+	[WmiDataId(3), read] uint32 ThreadId;
+	[WmiDataId(4), read] uint32 Options;
+	[WmiDataId(5), read] object Entries;
+};
+
+[dynamic: ToInstance, Guid("{9a280ac0-c8e0-11d1-84e2-00c04fb998a2}"), EventVersion(2)]
+class TcpIp : MSNT_SystemTrace
+{
+};
+
+[dynamic: ToInstance, EventType{27, 29, 30, 32, 34}]
+class TcpIp_TypeGroup3 : TcpIp
+{
+	[WmiDataId(1), read] uint32 PID;
+	[WmiDataId(2), read] uint32 size;
+	[WmiDataId(3), extension("IPAddrV6"), read] object daddr;
+	[WmiDataId(4), extension("IPAddrV6"), read] object saddr;
+	[WmiDataId(5), extension("Port"), read] object dport;
+	[WmiDataId(6), extension("Port"), read] object sport;
+	[WmiDataId(7), read] uint32 seqnum;
+	[WmiDataId(8), PointerType, read] uint32 connid;
+};
+
+[dynamic: ToInstance, EventType(10)]
+class TcpIp_SendIPV4 : TcpIp
+{
+	[WmiDataId(1), read] uint32 PID;
+	[WmiDataId(2), read] uint32 size;
+	[WmiDataId(3), extension("IPAddrV4"), read] object daddr;
+	[WmiDataId(4), extension("IPAddrV4"), read] object saddr;
+	[WmiDataId(5), extension("Port"), read] object dport;
+	[WmiDataId(6), extension("Port"), read] object sport;
+	[WmiDataId(7), read] uint32 startime;
+	[WmiDataId(8), read] uint32 endtime;
+	[WmiDataId(9), read] uint32 seqnum;
+	[WmiDataId(10), PointerType, read] uint32 connid;
+};
+
+[dynamic: ToInstance, EventType(17)]
+class TcpIp_Fail : TcpIp
+{
+	[WmiDataId(1), read] uint16 Proto;
+	[WmiDataId(2), read] uint16 FailureCode;
+};
+
+[dynamic: ToInstance, EventType{12, 15}]
+class TcpIp_TypeGroup2 : TcpIp
+{
+	[WmiDataId(1), read] uint32 PID;
+	[WmiDataId(2), read] uint32 size;
+	[WmiDataId(3), extension("IPAddrV4"), read] object daddr;
+	[WmiDataId(4), extension("IPAddrV4"), read] object saddr;
+	[WmiDataId(5), extension("Port"), read] object dport;
+	[WmiDataId(6), extension("Port"), read] object sport;
+	[WmiDataId(7), read] uint16 mss;
+	[WmiDataId(8), read] uint16 sackopt;
+	[WmiDataId(9), read] uint16 tsopt;
+	[WmiDataId(10), read] uint16 wsopt;
+	[WmiDataId(11), read] uint32 rcvwin;
+	[WmiDataId(12), read] sint16 rcvwinscale;
+	[WmiDataId(13), read] sint16 sndwinscale;
+	[WmiDataId(14), read] uint32 seqnum;
+	[WmiDataId(15), PointerType, read] uint32 connid;
+};
+
+[dynamic: ToInstance, EventType(26)]
+class TcpIp_SendIPV6 : TcpIp
+{
+	[WmiDataId(1), read] uint32 PID;
+	[WmiDataId(2), read] uint32 size;
+	[WmiDataId(3), extension("IPAddrV6"), read] object daddr;
+	[WmiDataId(4), extension("IPAddrV6"), read] object saddr;
+	[WmiDataId(5), extension("Port"), read] object dport;
+	[WmiDataId(6), extension("Port"), read] object sport;
+	[WmiDataId(7), read] uint32 startime;
+	[WmiDataId(8), read] uint32 endtime;
+	[WmiDataId(9), read] uint32 seqnum;
+	[WmiDataId(10), PointerType, read] uint32 connid;
+};
+
+[dynamic: ToInstance, EventType{11, 13, 14, 16, 18}]
+class TcpIp_TypeGroup1 : TcpIp
+{
+	[WmiDataId(1), read] uint32 PID;
+	[WmiDataId(2), read] uint32 size;
+	[WmiDataId(3), extension("IPAddrV4"), read] object daddr;
+	[WmiDataId(4), extension("IPAddrV4"), read] object saddr;
+	[WmiDataId(5), extension("Port"), read] object dport;
+	[WmiDataId(6), extension("Port"), read] object sport;
+	[WmiDataId(7), read] uint32 seqnum;
+	[WmiDataId(8), PointerType, read] uint32 connid;
+};
+
+[dynamic: ToInstance, EventType{28, 31}]
+class TcpIp_TypeGroup4 : TcpIp
+{
+	[WmiDataId(1), read] uint32 PID;
+	[WmiDataId(2), read] uint32 size;
+	[WmiDataId(3), extension("IPAddrV6"), read] object daddr;
+	[WmiDataId(4), extension("IPAddrV6"), read] object saddr;
+	[WmiDataId(5), extension("Port"), read] object dport;
+	[WmiDataId(6), extension("Port"), read] object sport;
+	[WmiDataId(7), read] uint16 mss;
+	[WmiDataId(8), read] uint16 sackopt;
+	[WmiDataId(9), read] uint16 tsopt;
+	[WmiDataId(10), read] uint16 wsopt;
+	[WmiDataId(11), read] uint32 rcvwin;
+	[WmiDataId(12), read] sint16 rcvwinscale;
+	[WmiDataId(13), read] sint16 sndwinscale;
+	[WmiDataId(14), read] uint32 seqnum;
+	[WmiDataId(15), PointerType, read] uint32 connid;
+};
+
+[dynamic: ToInstance, Guid("{3d6fa8d1-fe05-11d0-9dda-00c04fd7ba7c}"), EventVersion(0)]
+class Thread_V0 : MSNT_SystemTrace
+{
+};
+
+[dynamic: ToInstance, EventType{1, 2, 3, 4}]
+class Thread_V0_TypeGroup1 : Thread_V0
+{
+	[WmiDataId(1), format("x"), read] uint32 TThreadId;
+	[WmiDataId(2), format("x"), read] uint32 ProcessId;
+};
+
+[dynamic: ToInstance, Guid("{ae53722e-c863-11d2-8659-00c04fa321a1}"), EventVersion(1)]
+class Registry_V1 : MSNT_SystemTrace
+{
+};
+
+[dynamic: ToInstance, EventType{10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22}]
+class Registry_V1_TypeGroup1 : Registry_V1
+{
+	[WmiDataId(1), pointer, read] uint32 Status;
+	[WmiDataId(2), pointer, read] uint32 KeyHandle;
+	[WmiDataId(3), read] sint64 ElapsedTime;
+	[WmiDataId(4), read] uint32 Index;
+	[WmiDataId(5), StringTermination("NullTerminated"), format("w"), read] string KeyName;
+};
+
+[dynamic: ToInstance, Guid("{2cb15d1d-5fc1-11d2-abe1-00a0c911f518}"), EventVersion(0)]
+class Image_V0 : MSNT_SystemTrace
+{
+};
+
+[dynamic: ToInstance, EventType(10)]
+class Image_V0_Load : Image_V0
+{
+	[WmiDataId(1), pointer, read] uint32 BaseAddress;
+	[WmiDataId(2), read] uint32 ModuleSize;
+	[WmiDataId(3), StringTermination("NullTerminated"), format("w"), read] string ImageFileName;
+};
+
+[dynamic: ToInstance, Guid("{01853a65-418f-4f36-aefc-dc0f1d2fd235}"), EventVersion(4)]
+class SystemConfig_V4 : MSNT_SystemTrace
+{
+};
+
+[dynamic: ToInstance, EventType(32)]
+class SystemConfig_V4_MobilePlatform : SystemConfig_V4
+{
+	[WmiDataId(1), StringTermination("NullTerminated"), format("w"), read] string DeviceManufacturer;
+	[WmiDataId(2), StringTermination("NullTerminated"), format("w"), read] string DeviceManufacturerDisplayName;
+	[WmiDataId(3), StringTermination("NullTerminated"), format("w"), read] string DeviceModel;
+	[WmiDataId(4), StringTermination("NullTerminated"), format("w"), read] string DeviceModelDisplayName;
+	[WmiDataId(5), StringTermination("NullTerminated"), format("w"), read] string MobileOperator;
+	[WmiDataId(6), StringTermination("NullTerminated"), format("w"), read] string SocVersion;
+	[WmiDataId(7), StringTermination("NullTerminated"), format("w"), read] string BspVersion;
+};
+
+[dynamic: ToInstance, EventType(22)]
+class SystemConfig_V4_PnP : SystemConfig_V4
+{
+	[WmiDataId(1), extension("GUID"), read] object ClassGuid;
+	[WmiDataId(2), read] uint32 UpperFiltersCount;
+	[WmiDataId(3), read] uint32 LowerFiltersCount;
+	[WmiDataId(4), StringTermination("NullTerminated"), format("w"), read] string DeviceID;
+	[WmiDataId(5), StringTermination("NullTerminated"), format("w"), read] string DeviceDescription;
+	[WmiDataId(6), StringTermination("NullTerminated"), format("w"), read] string FriendlyName;
+	[WmiDataId(7), StringTermination("NullTerminated"), format("w"), read] string PdoName;
+	[WmiDataId(8), StringTermination("NullTerminated"), format("w"), read] string ServiceName;
+	[WmiDataId(9), StringTermination("NullTerminated"), format("w"), WmiSizeIs("UpperFiltersCount"), read] string UpperFilters;
+	[WmiDataId(10), StringTermination("NullTerminated"), format("w"), WmiSizeIs("LowerFiltersCount"), read] string LowerFilters;
+};
+
+[dynamic: ToInstance, Guid("{2cb15d1d-5fc1-11d2-abe1-00a0c911f518}"), EventVersion(1)]
+class Image_V1 : MSNT_SystemTrace
+{
+};
+
+[dynamic: ToInstance, EventType(10)]
+class Image_V1_Load : Image_V1
+{
+	[WmiDataId(1), pointer, read] uint32 ImageBase;
+	[WmiDataId(2), pointer, read] uint32 ImageSize;
+	[WmiDataId(3), read] uint32 ProcessId;
+	[WmiDataId(4), StringTermination("NullTerminated"), format("w"), read] string FileName;
+};
+
+[dynamic: ToInstance, Guid("{3d6fa8d1-fe05-11d0-9dda-00c04fd7ba7c}"), EventVersion(3)]
+class Thread_V3 : MSNT_SystemTrace
+{
+};
+
+[dynamic: ToInstance, EventType{1, 2, 3, 4}]
+class Thread_V3_TypeGroup1 : Thread_V3
+{
+	[WmiDataId(1), format("x"), read] uint32 ProcessId;
+	[WmiDataId(2), format("x"), read] uint32 TThreadId;
+	[WmiDataId(3), pointer, read] uint32 StackBase;
+	[WmiDataId(4), pointer, read] uint32 StackLimit;
+	[WmiDataId(5), pointer, read] uint32 UserStackBase;
+	[WmiDataId(6), pointer, read] uint32 UserStackLimit;
+	[WmiDataId(7), pointer, read] uint32 Affinity;
+	[WmiDataId(8), pointer, read] uint32 Win32StartAddr;
+	[WmiDataId(9), pointer, read] uint32 TebBase;
+	[WmiDataId(10), format("x"), read] uint32 SubProcessTag;
+	[WmiDataId(11), read] uint8 BasePriority;
+	[WmiDataId(12), read] uint8 PagePriority;
+	[WmiDataId(13), read] uint8 IoPriority;
+	[WmiDataId(14), read] uint8 ThreadFlags;
+};
+
+[dynamic: ToInstance, EventType{48, 49, 51, 52}]
+class ThreadPriority : Thread_V3
+{
+	[WmiDataId(1), format("x"), read] uint32 ThreadId;
+	[WmiDataId(2), read] uint8 OldPriority;
+	[WmiDataId(3), read] uint8 NewPriority;
+	[WmiDataId(4), read] uint16 Reserved;
+};
+
+[dynamic: ToInstance, EventType(36)]
+class CSwitch_V3 : Thread_V3
+{
+	[WmiDataId(1), format("x"), read] uint32 NewThreadId;
+	[WmiDataId(2), format("x"), read] uint32 OldThreadId;
+	[WmiDataId(3), read] sint8 NewThreadPriority;
+	[WmiDataId(4), read] sint8 OldThreadPriority;
+	[WmiDataId(5), read] uint8 PreviousCState;
+	[WmiDataId(6), read] sint8 SpareByte;
+	[WmiDataId(7), read] sint8 OldThreadWaitReason;
+	[WmiDataId(8), read] sint8 ThreadFlags;
+	[WmiDataId(9), read] sint8 OldThreadState;
+	[WmiDataId(10), read] sint8 OldThreadWaitIdealProcessor;
+	[WmiDataId(11), format("x"), read] uint32 NewThreadWaitTime;
+	[WmiDataId(12), read] uint32 Reserved;
+};
+
+[dynamic: ToInstance, Guid("{01853a65-418f-4f36-aefc-dc0f1d2fd235}"), EventVersion(3)]
+class SystemConfig_V3 : MSNT_SystemTrace
+{
+};
+
+[dynamic: ToInstance, EventType(32)]
+class SystemConfig_V3_MobilePlatform : SystemConfig_V3
+{
+	[WmiDataId(1), StringTermination("NullTerminated"), format("w"), read] string DeviceManufacturer;
+	[WmiDataId(2), StringTermination("NullTerminated"), format("w"), read] string DeviceManufacturerDisplayName;
+	[WmiDataId(3), StringTermination("NullTerminated"), format("w"), read] string DeviceModel;
+	[WmiDataId(4), StringTermination("NullTerminated"), format("w"), read] string DeviceModelDisplayName;
+	[WmiDataId(5), StringTermination("NullTerminated"), format("w"), read] string MobileOperator;
+	[WmiDataId(6), StringTermination("NullTerminated"), format("w"), read] string MobileOperatorDisplayName;
+	[WmiDataId(7), StringTermination("NullTerminated"), format("w"), read] string HardwareVersion;
+	[WmiDataId(8), StringTermination("NullTerminated"), format("w"), read] string SocVersion;
+	[WmiDataId(9), StringTermination("NullTerminated"), format("w"), read] string RadioHardwareVersion;
+	[WmiDataId(10), StringTermination("NullTerminated"), format("w"), read] string RadioSoftwareVersion;
+	[WmiDataId(11), StringTermination("NullTerminated"), format("w"), read] string BspVersion;
+	[WmiDataId(12), StringTermination("NullTerminated"), format("w"), read] string OemSoftwareVersion;
+};
+
+[dynamic: ToInstance, EventType(15)]
+class SystemConfig_V3_Services : SystemConfig_V3
+{
+	[WmiDataId(1), format("x"), read] uint32 ProcessId;
+	[WmiDataId(2), format("x"), read] uint32 ServiceState;
+	[WmiDataId(3), format("x"), read] uint32 SubProcessTag;
+	[WmiDataId(4), StringTermination("NullTerminated"), format("w"), read] string ServiceName;
+	[WmiDataId(5), StringTermination("NullTerminated"), format("w"), read] string DisplayName;
+	[WmiDataId(6), StringTermination("NullTerminated"), format("w"), read] string ProcessName;
+	[WmiDataId(7), StringTermination("NullTerminated"), format("w"), read] string LoadOrderGroup;
+	[WmiDataId(8), StringTermination("NullTerminated"), format("w"), read] string SvchostGroup;
+};
+
+[dynamic: ToInstance, EventType(21)]
+class SystemConfig_V3_IRQ : SystemConfig_V3
+{
+	[WmiDataId(1), format("x"), read] uint64 IRQAffinity;
+	[WmiDataId(2), read] uint16 IRQGroup;
+	[WmiDataId(3), read] uint16 Reserved;
+	[WmiDataId(4), read] uint32 IRQNum;
+	[WmiDataId(5), read] uint32 DeviceDescriptionLen;
+	[WmiDataId(6), StringTermination("NullTerminated"), format("w"), read] string DeviceDescription;
+};
+
+[dynamic: ToInstance, EventType(10)]
+class SystemConfig_V3_CPU : SystemConfig_V3
+{
+	[WmiDataId(1), read] uint32 MHz;
+	[WmiDataId(2), read] uint32 NumberOfProcessors;
+	[WmiDataId(3), read] uint32 MemSize;
+	[WmiDataId(4), read] uint32 PageSize;
+	[WmiDataId(5), read] uint32 AllocationGranularity;
+	[WmiDataId(6), format("s"), read, MAX(256)] char16 ComputerName;
+	[WmiDataId(7), format("s"), read, MAX(134)] char16 DomainName;
+	[WmiDataId(8), pointer, read] uint32 HyperThreadingFlag;
+	[WmiDataId(9), pointer, read] uint32 HighestUserAddress;
+	[WmiDataId(10), read] uint16 ProcessorArchitecture;
+	[WmiDataId(11), read] uint16 ProcessorLevel;
+	[WmiDataId(12), read] uint16 ProcessorRevision;
+	[WmiDataId(13), read] uint8 PaeEnabled;
+	[WmiDataId(14), read] uint8 NxEnabled;
+	[WmiDataId(15), read] uint32 MemorySpeed;
+};
+
+[dynamic: ToInstance, EventType(22)]
+class SystemConfig_V3_PnP : SystemConfig_V3
+{
+	[WmiDataId(1), read] uint32 IDLength;
+	[WmiDataId(2), read] uint32 DescriptionLength;
+	[WmiDataId(3), read] uint32 FriendlyNameLength;
+	[WmiDataId(4), StringTermination("NullTerminated"), format("w"), read] string DeviceID;
+	[WmiDataId(5), StringTermination("NullTerminated"), format("w"), read] string DeviceDescription;
+	[WmiDataId(6), StringTermination("NullTerminated"), format("w"), read] string FriendlyName;
+	[WmiDataId(7), StringTermination("NullTerminated"), format("w"), read] string PdoName;
+};
+
+[dynamic: ToInstance, Guid("{90cbdc39-4a3e-11d1-84f4-0000f80464e3}"), EventVersion(0)]
+class FileIo_V0 : MSNT_SystemTrace
+{
+};
+
+[dynamic: ToInstance, EventType(0)]
+class FileIo_V0_Name : FileIo_V0
+{
+	[WmiDataId(1), pointer, read] uint32 FileObject;
+	[WmiDataId(2), StringTermination("NullTerminated"), format("w"), read] string FileName;
+};
+
+[dynamic: ToInstance, Guid("{3d6fa8d1-fe05-11d0-9dda-00c04fd7ba7c}"), EventVersion(4)]
+class Thread_V4 : MSNT_SystemTrace
+{
+};
+
+[dynamic: ToInstance, EventType{1, 2, 3, 4}]
+class Thread_TypeGroup1 : Thread_V4
+{
+	[WmiDataId(1), format("x"), read] uint32 ProcessId;
+	[WmiDataId(2), format("x"), read] uint32 TThreadId;
+	[WmiDataId(3), pointer, read] uint32 StackBase;
+	[WmiDataId(4), pointer, read] uint32 StackLimit;
+	[WmiDataId(5), pointer, read] uint32 UserStackBase;
+	[WmiDataId(6), pointer, read] uint32 UserStackLimit;
+	[WmiDataId(7), pointer, read] uint32 Affinity;
+	[WmiDataId(8), pointer, read] uint32 Win32StartAddr;
+	[WmiDataId(9), pointer, read] uint32 TebBase;
+	[WmiDataId(10), format("x"), read] uint32 SubProcessTag;
+	[WmiDataId(11), read] uint8 BasePriority;
+	[WmiDataId(12), read] uint8 PagePriority;
+	[WmiDataId(13), read] uint8 IoPriority;
+	[WmiDataId(14), read] uint8 ThreadFlags;
+	[WmiDataId(15), StringTermination("NullTerminated"), format("w"), read] string ThreadName;
+};
+
+[dynamic: ToInstance, EventType(36)]
+class CSwitch_V4 : Thread_V4
+{
+	[WmiDataId(1), format("x"), read] uint32 NewThreadId;
+	[WmiDataId(2), format("x"), read] uint32 OldThreadId;
+	[WmiDataId(3), read] sint8 NewThreadPriority;
+	[WmiDataId(4), read] sint8 OldThreadPriority;
+	[WmiDataId(5), read] uint8 PreviousCState;
+	[WmiDataId(6), read] sint8 SpareByte;
+	[WmiDataId(7), read] sint8 OldThreadWaitReason;
+	[WmiDataId(8), read] sint8 ThreadFlags;
+	[WmiDataId(9), read] sint8 OldThreadState;
+	[WmiDataId(10), read] sint8 OldThreadWaitIdealProcessor;
+	[WmiDataId(11), format("x"), read] uint32 NewThreadWaitTime;
+	[WmiDataId(12), read] uint32 Reserved;
+};
+
+[dynamic: ToInstance, Guid("{3d6fa8d4-fe05-11d0-9dda-00c04fd7ba7c}"), EventVersion(0)]
+class DiskIo_V0 : MSNT_SystemTrace
+{
+};
+
+[dynamic: ToInstance, EventType{10, 11}]
+class DiskIo_V0_TypeGroup1 : DiskIo_V0
+{
+	[WmiDataId(1), read] uint32 DiskNumber;
+	[WmiDataId(2), format("x"), read] uint32 IrpFlags;
+	[WmiDataId(3), read] uint32 TransferSize;
+	[WmiDataId(4), read] uint32 Reserved;
+	[WmiDataId(5), read] uint64 ByteOffset;
+	[WmiDataId(6), pointer, read] uint32 FileObject;
+};
+
+[dynamic: ToInstance, Guid("{01853a65-418f-4f36-aefc-dc0f1d2fd235}"), EventVersion(5)]
+class SystemConfig : MSNT_SystemTrace
+{
+};
+
+[dynamic: ToInstance, EventType(22)]
+class SystemConfig_PnP : SystemConfig
+{
+	[WmiDataId(1), extension("GUID"), read] object ClassGuid;
+	[WmiDataId(2), read] uint32 UpperFiltersCount;
+	[WmiDataId(3), read] uint32 LowerFiltersCount;
+	[WmiDataId(4), read] uint32 DevStatus;
+	[WmiDataId(5), read] uint32 DevProblem;
+	[WmiDataId(6), StringTermination("NullTerminated"), format("w"), read] string DeviceID;
+	[WmiDataId(7), StringTermination("NullTerminated"), format("w"), read] string DeviceDescription;
+	[WmiDataId(8), StringTermination("NullTerminated"), format("w"), read] string FriendlyName;
+	[WmiDataId(9), StringTermination("NullTerminated"), format("w"), read] string PdoName;
+	[WmiDataId(10), StringTermination("NullTerminated"), format("w"), read] string ServiceName;
+	[WmiDataId(11), StringTermination("NullTerminated"), format("w"), WmiSizeIs("UpperFiltersCount"), read] string UpperFilters;
+	[WmiDataId(12), StringTermination("NullTerminated"), format("w"), WmiSizeIs("LowerFiltersCount"), read] string LowerFilters;
+};
+
+[dynamic: ToInstance, Guid("{3d6fa8d0-fe05-11d0-9dda-00c04fd7ba7c}"), EventVersion(5)]
+class Process : MSNT_SystemTrace
+{
+};
+
+[dynamic: ToInstance, EventType{39}]
+class Process_Defunct_TypeGroup1 : Process
+{
+	[WmiDataId(1), pointer, read] uint32 UniqueProcessKey;
+	[WmiDataId(2), format("x"), read] uint32 ProcessId;
+	[WmiDataId(3), format("x"), read] uint32 ParentId;
+	[WmiDataId(4), read] uint32 SessionId;
+	[WmiDataId(5), read] sint32 ExitStatus;
+	[WmiDataId(6), pointer, read] uint32 DirectoryTableBase;
+	[WmiDataId(8), extension("Sid"), read] object UserSID;
+	[WmiDataId(9), StringTermination("NullTerminated"), read] string ImageFileName;
+	[WmiDataId(10), StringTermination("NullTerminated"), format("w"), read] string CommandLine;
+	[WmiDataId(11), StringTermination("NullTerminated"), format("w"), read] string PackageFullName;
+	[WmiDataId(12), StringTermination("NullTerminated"), format("w"), read] string ApplicationId;
+	[WmiDataId(13), read] uint64 ExitTime;
+};
+
+[dynamic: ToInstance, Guid("{0268a8b6-74fd-4302-9dd0-6e8f1795c0cf}"), EventVersion(2)]
+class PoolTrace : MSNT_SystemTrace
+{
+};
+
+[dynamic: ToInstance, EventType{32, 34}]
+class PoolAllocFree : PoolTrace
+{
+	[WmiDataId(1), read] uint32 Type;
+	[WmiDataId(2), format("x"), read] uint32 Tag;
+	[WmiDataId(3), extension("SizeT"), read] object NumberOfBytes;
+	[WmiDataId(4), pointer, read] uint32 Entry;
+};
+
+[dynamic: ToInstance, EventType{33, 35}]
+class SessionPoolAllocFree : PoolTrace
+{
+	[WmiDataId(1), read] uint32 Type;
+	[WmiDataId(2), format("x"), read] uint32 Tag;
+	[WmiDataId(3), extension("SizeT"), read] object NumberOfBytes;
+	[WmiDataId(4), pointer, read] uint32 Entry;
+	[WmiDataId(5), read] uint32 SessionId;
+};
+
+[dynamic: ToInstance, EventType{40, 41, 42, 43, 44, 45, 46, 47}]
+class PoolSnapshot : PoolTrace
+{
+};
+
+[dynamic: ToInstance, Guid("{3d6fa8d4-fe05-11d0-9dda-00c04fd7ba7c}"), EventVersion(3)]
+class DiskIo : MSNT_SystemTrace
+{
+};
+
+[dynamic: ToInstance, EventType{12, 13, 15, 58, 59, 60}]
+class DiskIo_TypeGroup2 : DiskIo
+{
+	[WmiDataId(1), pointer, read] uint32 Irp;
+	[WmiDataId(2), read] uint32 IssuingThreadId;
+};
+
+[dynamic: ToInstance, EventType{10, 11, 55, 56}]
+class DiskIo_TypeGroup1 : DiskIo
+{
+	[WmiDataId(1), read] uint32 DiskNumber;
+	[WmiDataId(2), format("x"), read] uint32 IrpFlags;
+	[WmiDataId(3), read] uint32 TransferSize;
+	[WmiDataId(4), read] uint32 Reserved;
+	[WmiDataId(5), read] uint64 ByteOffset;
+	[WmiDataId(6), pointer, read] uint32 FileObject;
+	[WmiDataId(7), pointer, read] uint32 Irp;
+	[WmiDataId(8), read] uint64 HighResResponseTime;
+	[WmiDataId(9), read] uint32 IssuingThreadId;
+};
+
+[dynamic: ToInstance, EventType{14, 57}]
+class DiskIo_TypeGroup3 : DiskIo
+{
+	[WmiDataId(1), read] uint32 DiskNumber;
+	[WmiDataId(2), format("x"), read] uint32 IrpFlags;
+	[WmiDataId(3), read] uint64 HighResResponseTime;
+	[WmiDataId(4), pointer, read] uint32 Irp;
+	[WmiDataId(5), read] uint32 IssuingThreadId;
+};
+
+[dynamic: ToInstance, Guid("{6a399ae0-4bc6-4de9-870b-3657f8947e7e}"), EventVersion(0)]
+class Lost_Event : MSNT_SystemTrace
+{
+};
+
+[dynamic: ToInstance, EventType{32, 33, 34}]
+class RT_LostEvent : Lost_Event
+{
+};
+
+[dynamic: ToInstance, Guid("{90cbdc39-4a3e-11d1-84f4-0000f80464e3}"), EventVersion(1)]
+class FileIo_V1 : MSNT_SystemTrace
+{
+};
+
+[dynamic: ToInstance, EventType{0, 32}]
+class FileIo_V1_Name : FileIo_V1
+{
+	[WmiDataId(1), pointer, read] uint32 FileObject;
+	[WmiDataId(2), StringTermination("NullTerminated"), format("w"), read] string FileName;
+};
+
+[dynamic: ToInstance, Guid("{68fdd900-4a3e-11d1-84f4-0000f80464e3}"), EventVersion(1)]
+class EventTraceEvent_V1 : MSNT_SystemTrace
+{
+};
+
+[dynamic: ToInstance, EventType(0)]
+class EventTrace_V1_Header : EventTraceEvent_V1
+{
+	[WmiDataId(1), read] uint32 BufferSize;
+	[WmiDataId(2), read] uint32 Version;
+	[WmiDataId(3), read] uint32 ProviderVersion;
+	[WmiDataId(4), read] uint32 NumberOfProcessors;
+	[WmiDataId(5), read] uint64 EndTime;
+	[WmiDataId(6), read] uint32 TimerResolution;
+	[WmiDataId(7), read] uint32 MaxFileSize;
+	[WmiDataId(8), format("x"), read] uint32 LogFileMode;
+	[WmiDataId(9), read] uint32 BuffersWritten;
+	[WmiDataId(10), read] uint32 StartBuffers;
+	[WmiDataId(11), read] uint32 PointerSize;
+	[WmiDataId(12), read] uint32 EventsLost;
+	[WmiDataId(13), read] uint32 CPUSpeed;
+	[WmiDataId(14), pointer, read] uint32 LoggerName;
+	[WmiDataId(15), pointer, read] uint32 LogFileName;
+	[WmiDataId(16), extension("NoPrint"), read, MAX(176)] uint8 TimeZoneInformation;
+	[WmiDataId(17), read] uint64 BootTime;
+	[WmiDataId(18), read] uint64 PerfFreq;
+	[WmiDataId(19), read] uint64 StartTime;
+	[WmiDataId(20), format("x"), read] uint32 ReservedFlags;
+	[WmiDataId(21), read] uint32 BuffersLost;
+	[WmiDataId(22), StringTermination("NullTerminated"), format("w"), read] string SessionNameString;
+	[WmiDataId(23), StringTermination("NullTerminated"), format("w"), read] string LogFileNameString;
+};
+
+[dynamic: ToInstance, EventType(8)]
+class RDComplete_V1 : EventTraceEvent_V1
+{
+};
+
+[dynamic: ToInstance, EventType{5, 32}]
+class Header_Extension_V1_TypeGroup : EventTraceEvent_V1
+{
+	[WmiDataId(1), format("x"), read] uint32 GroupMask1;
+	[WmiDataId(2), format("x"), read] uint32 GroupMask2;
+	[WmiDataId(3), format("x"), read] uint32 GroupMask3;
+	[WmiDataId(4), format("x"), read] uint32 GroupMask4;
+	[WmiDataId(5), format("x"), read] uint32 GroupMask5;
+	[WmiDataId(6), format("x"), read] uint32 GroupMask6;
+	[WmiDataId(7), format("x"), read] uint32 GroupMask7;
+	[WmiDataId(8), format("x"), read] uint32 GroupMask8;
+};
+
+[dynamic: ToInstance, Guid("{13976d09-a327-438c-950b-7f03192815c7}"), EventVersion(2)]
+class Debugger : MSNT_SystemTrace
+{
+};
+
+[dynamic: ToInstance, EventType(32)]
+class DebugPrint_Event : Debugger
+{
+	[WmiDataId(1), read] uint32 Component;
+	[WmiDataId(2), read] uint32 Level;
+	[WmiDataId(3), StringTermination("NullTerminated"), read] string Message;
+};
+
+[dynamic: ToInstance, Guid("{3d6fa8d4-fe05-11d0-9dda-00c04fd7ba7c}"), EventVersion(2)]
+class DiskIo_V2 : MSNT_SystemTrace
+{
+};
+
+[dynamic: ToInstance, EventType{10, 11}]
+class DiskIo_V2_TypeGroup1 : DiskIo_V2
+{
+	[WmiDataId(1), read] uint32 DiskNumber;
+	[WmiDataId(2), format("x"), read] uint32 IrpFlags;
+	[WmiDataId(3), read] uint32 TransferSize;
+	[WmiDataId(4), read] uint32 Reserved;
+	[WmiDataId(5), read] uint64 ByteOffset;
+	[WmiDataId(6), pointer, read] uint32 FileObject;
+	[WmiDataId(7), pointer, read] uint32 Irp;
+	[WmiDataId(8), read] uint64 HighResResponseTime;
+};
+
+[dynamic: ToInstance, EventType(35)]
+class DriverMajorFunctionReturn : DiskIo_V2
+{
+	[WmiDataId(1), pointer, read] uint32 Irp;
+	[WmiDataId(2), read] uint32 UniqMatchId;
+};
+
+[dynamic: ToInstance, EventType(37)]
+class DriverCompletionRoutine : DiskIo_V2
+{
+	[WmiDataId(1), pointer, read] uint32 Routine;
+	[WmiDataId(2), pointer, read] uint32 IrpPtr;
+	[WmiDataId(3), read] uint32 UniqMatchId;
+};
+
+[dynamic: ToInstance, EventType(34)]
+class DriverMajorFunctionCall : DiskIo_V2
+{
+	[WmiDataId(1), read] uint32 MajorFunction;
+	[WmiDataId(2), read] uint32 MinorFunction;
+	[WmiDataId(3), pointer, read] uint32 RoutineAddr;
+	[WmiDataId(4), pointer, read] uint32 FileObject;
+	[WmiDataId(5), pointer, read] uint32 Irp;
+	[WmiDataId(6), read] uint32 UniqMatchId;
+};
+
+[dynamic: ToInstance, EventType(53)]
+class DriverCompleteRequestReturn : DiskIo_V2
+{
+	[WmiDataId(1), pointer, read] uint32 Irp;
+	[WmiDataId(2), read] uint32 UniqMatchId;
+};
+
+[dynamic: ToInstance, EventType(14)]
+class DiskIo_V2_TypeGroup3 : DiskIo_V2
+{
+	[WmiDataId(1), read] uint32 DiskNumber;
+	[WmiDataId(2), format("x"), read] uint32 IrpFlags;
+	[WmiDataId(3), read] uint64 HighResResponseTime;
+	[WmiDataId(4), pointer, read] uint32 Irp;
+};
+
+[dynamic: ToInstance, EventType{12, 13, 15}]
+class DiskIo_V2_TypeGroup2 : DiskIo_V2
+{
+	[WmiDataId(1), pointer, read] uint32 Irp;
+};
+
+[dynamic: ToInstance, EventType(52)]
+class DriverCompleteRequest : DiskIo_V2
+{
+	[WmiDataId(1), pointer, read] uint32 RoutineAddr;
+	[WmiDataId(2), pointer, read] uint32 Irp;
+	[WmiDataId(3), read] uint32 UniqMatchId;
+};
+
+[dynamic: ToInstance, Guid("{01853a65-418f-4f36-aefc-dc0f1d2fd235}"), EventVersion(0)]
+class SystemConfig_V0 : MSNT_SystemTrace
+{
+};
+
+[dynamic: ToInstance, EventType(21)]
+class SystemConfig_V0_IRQ : SystemConfig_V0
+{
+	[WmiDataId(1), format("x"), read] uint64 IRQAffinity;
+	[WmiDataId(2), read] uint32 IRQNum;
+	[WmiDataId(3), read] uint32 DeviceDescriptionLen;
+	[WmiDataId(4), StringTermination("NullTerminated"), format("w"), read] string DeviceDescription;
+};
+
+[dynamic: ToInstance, EventType(10)]
+class SystemConfig_V0_CPU : SystemConfig_V0
+{
+	[WmiDataId(1), read] uint32 MHz;
+	[WmiDataId(2), read] uint32 NumberOfProcessors;
+	[WmiDataId(3), read] uint32 MemSize;
+	[WmiDataId(4), read] uint32 PageSize;
+	[WmiDataId(5), read] uint32 AllocationGranularity;
+	[WmiDataId(6), read, MAX(256)] char16 ComputerName;
+	[WmiDataId(7), read, MAX(132)] char16 DomainName;
+	[WmiDataId(8), pointer, read] uint32 HyperThreadingFlag;
+};
+
+[dynamic: ToInstance, EventType(15)]
+class SystemConfig_V0_Services : SystemConfig_V0
+{
+	[WmiDataId(1), read, MAX(34)] char16 ServiceName;
+	[WmiDataId(2), read, MAX(256)] char16 DisplayName;
+	[WmiDataId(3), read, MAX(34)] char16 ProcessName;
+	[WmiDataId(4), read] uint32 ProcessId;
+};
+
+[dynamic: ToInstance, EventType(12)]
+class SystemConfig_V0_LogDisk : SystemConfig_V0
+{
+	[WmiDataId(1), read] uint64 StartOffset;
+	[WmiDataId(2), read] uint64 PartitionSize;
+	[WmiDataId(3), read] uint32 DiskNumber;
+	[WmiDataId(4), read] uint32 Size;
+	[WmiDataId(5), read] uint32 DriveType;
+	[WmiDataId(6), read, MAX(4)] char16 DriveLetterString;
+	[WmiDataId(7), read] uint32 Pad1;
+	[WmiDataId(8), read] uint32 PartitionNumber;
+	[WmiDataId(9), read] uint32 SectorsPerCluster;
+	[WmiDataId(10), read] uint32 BytesPerSector;
+	[WmiDataId(11), read] uint32 Pad2;
+	[WmiDataId(12), read] sint64 NumberOfFreeClusters;
+	[WmiDataId(13), read] sint64 TotalNumberOfClusters;
+	[WmiDataId(14), read, MAX(16)] char16 FileSystem;
+	[WmiDataId(15), read] uint32 VolumeExt;
+};
+
+[dynamic: ToInstance, EventType(14)]
+class SystemConfig_V0_Video : SystemConfig_V0
+{
+	[WmiDataId(1), read] uint32 MemorySize;
+	[WmiDataId(2), read] uint32 XResolution;
+	[WmiDataId(3), read] uint32 YResolution;
+	[WmiDataId(4), read] uint32 BitsPerPixel;
+	[WmiDataId(5), read] uint32 VRefresh;
+	[WmiDataId(6), read, MAX(256)] char16 ChipType;
+	[WmiDataId(7), read, MAX(256)] char16 DACType;
+	[WmiDataId(8), read, MAX(256)] char16 AdapterString;
+	[WmiDataId(9), read, MAX(256)] char16 BiosString;
+	[WmiDataId(10), read, MAX(256)] char16 DeviceId;
+	[WmiDataId(11), format("x"), read] uint32 StateFlags;
+};
+
+[dynamic: ToInstance, EventType(11)]
+class SystemConfig_V0_PhyDisk : SystemConfig_V0
+{
+	[WmiDataId(1), read] uint32 DiskNumber;
+	[WmiDataId(2), read] uint32 BytesPerSector;
+	[WmiDataId(3), read] uint32 SectorsPerTrack;
+	[WmiDataId(4), read] uint32 TracksPerCylinder;
+	[WmiDataId(5), read] uint64 Cylinders;
+	[WmiDataId(6), read] uint32 SCSIPort;
+	[WmiDataId(7), read] uint32 SCSIPath;
+	[WmiDataId(8), read] uint32 SCSITarget;
+	[WmiDataId(9), read] uint32 SCSILun;
+	[WmiDataId(10), read, MAX(256)] char16 Manufacturer;
+	[WmiDataId(11), read] uint32 PartitionCount;
+	[WmiDataId(12), read] uint8 WriteCacheEnabled;
+	[WmiDataId(13), read] uint8 Pad;
+	[WmiDataId(14), read, MAX(3)] char16 BootDriveLetter;
+	[WmiDataId(15), read, MAX(2)] char16 Spare;
+};
+
+[dynamic: ToInstance, EventType(16)]
+class SystemConfig_V0_Power : SystemConfig_V0
+{
+	[WmiDataId(1), read] uint8 S1;
+	[WmiDataId(2), read] uint8 S2;
+	[WmiDataId(3), read] uint8 S3;
+	[WmiDataId(4), read] uint8 S4;
+	[WmiDataId(5), read] uint8 S5;
+	[WmiDataId(6), read] uint8 Pad1;
+	[WmiDataId(7), read] uint8 Pad2;
+	[WmiDataId(8), read] uint8 Pad3;
+};
+
+[dynamic: ToInstance, EventType(22)]
+class SystemConfig_V0_PnP : SystemConfig_V0
+{
+	[WmiDataId(1), read] uint32 IDLength;
+	[WmiDataId(2), read] uint32 DescriptionLength;
+	[WmiDataId(3), read] uint32 FriendlyNameLength;
+	[WmiDataId(4), StringTermination("NullTerminated"), format("w"), read] string DeviceID;
+	[WmiDataId(5), StringTermination("NullTerminated"), format("w"), read] string DeviceDescription;
+	[WmiDataId(6), StringTermination("NullTerminated"), format("w"), read] string FriendlyName;
+};
+
+[dynamic: ToInstance, EventType(13)]
+class SystemConfig_V0_NIC : SystemConfig_V0
+{
+	[WmiDataId(1), read, MAX(256)] char16 NICName;
+	[WmiDataId(2), read] uint32 Index;
+	[WmiDataId(3), read] uint32 PhysicalAddrLen;
+	[WmiDataId(4), read, MAX(8)] char16 PhysicalAddr;
+	[WmiDataId(5), read] uint32 Size;
+	[WmiDataId(6), read] sint32 IpAddress;
+	[WmiDataId(7), read] sint32 SubnetMask;
+	[WmiDataId(8), read] sint32 DhcpServer;
+	[WmiDataId(9), read] sint32 Gateway;
+	[WmiDataId(10), read] sint32 PrimaryWinsServer;
+	[WmiDataId(11), read] sint32 SecondaryWinsServer;
+	[WmiDataId(12), read] sint32 DnsServer1;
+	[WmiDataId(13), read] sint32 DnsServer2;
+	[WmiDataId(14), read] sint32 DnsServer3;
+	[WmiDataId(15), read] sint32 DnsServer4;
+	[WmiDataId(16), read] uint32 Data;
+};
+
+[dynamic: ToInstance, Guid("{01853a65-418f-4f36-aefc-dc0f1d2fd235}"), EventVersion(2)]
+class SystemConfig_V2 : MSNT_SystemTrace
+{
+};
+
+[dynamic: ToInstance, EventType(24)]
+class SystemConfig_V2_NumaNode : SystemConfig_V2
+{
+	[WmiDataId(1), read] uint32 NodeCount;
+	[WmiDataId(2), WmiSizeIs("NodeCount"), read] uint64 NodeMap;
+};
+
+[dynamic: ToInstance, EventType(22)]
+class SystemConfig_V2_PnP : SystemConfig_V2
+{
+	[WmiDataId(1), read] uint32 IDLength;
+	[WmiDataId(2), read] uint32 DescriptionLength;
+	[WmiDataId(3), read] uint32 FriendlyNameLength;
+	[WmiDataId(4), StringTermination("NullTerminated"), format("w"), read] string DeviceID;
+	[WmiDataId(5), StringTermination("NullTerminated"), format("w"), read] string DeviceDescription;
+	[WmiDataId(6), StringTermination("NullTerminated"), format("w"), read] string FriendlyName;
+};
+
+[dynamic: ToInstance, EventType(29)]
+class SystemConfig_V2_CodeIntegrity : SystemConfig_V2
+{
+	[WmiDataId(1), read] uint32 CodeIntegrityInfo;
+};
+
+[dynamic: ToInstance, EventType(12)]
+class SystemConfig_V2_LogDisk : SystemConfig_V2
+{
+	[WmiDataId(1), read] uint64 StartOffset;
+	[WmiDataId(2), read] uint64 PartitionSize;
+	[WmiDataId(3), read] uint32 DiskNumber;
+	[WmiDataId(4), read] uint32 Size;
+	[WmiDataId(5), read] uint32 DriveType;
+	[WmiDataId(6), format("s"), read, MAX(4)] char16 DriveLetterString;
+	[WmiDataId(7), read] uint32 Pad1;
+	[WmiDataId(8), read] uint32 PartitionNumber;
+	[WmiDataId(9), read] uint32 SectorsPerCluster;
+	[WmiDataId(10), read] uint32 BytesPerSector;
+	[WmiDataId(11), read] uint32 Pad2;
+	[WmiDataId(12), read] sint64 NumberOfFreeClusters;
+	[WmiDataId(13), read] sint64 TotalNumberOfClusters;
+	[WmiDataId(14), format("s"), read, MAX(16)] char16 FileSystem;
+	[WmiDataId(15), read] uint32 VolumeExt;
+	[WmiDataId(16), read] uint32 Pad3;
+};
+
+[dynamic: ToInstance, EventType(36)]
+class SystemConfig_Virtualization : SystemConfig_V2
+{
+	[WmiDataId(1), read] uint8 VbsEnabled;
+	[WmiDataId(2), read] uint8 HvciEnabled;
+	[WmiDataId(3), read] uint8 HyperVisorEnabled;
+	[WmiDataId(4), read] uint8 Reserved;
+};
+
+[dynamic: ToInstance, EventType(23)]
+class SystemConfig_V2_IDEChannel : SystemConfig_V2
+{
+	[WmiDataId(1), read] uint32 TargetId;
+	[WmiDataId(2), format("x"), read] uint32 DeviceType;
+	[WmiDataId(3), format("x"), read] uint32 DeviceTimingMode;
+	[WmiDataId(4), read] uint32 LocationInformationLen;
+	[WmiDataId(5), StringTermination("NullTerminated"), format("w"), read] string LocationInformation;
+};
+
+[dynamic: ToInstance, EventType(37)]
+class SystemConfig_Boot : SystemConfig_V2
+{
+	[WmiDataId(1), read] uint64 BootFlags;
+	[WmiDataId(2), read] uint32 FirmwareType;
+	[WmiDataId(3), read] uint8 SecureBootEnabled;
+	[WmiDataId(4), read] uint8 SecureBootCapable;
+	[WmiDataId(5), read] uint8 Reserved1;
+	[WmiDataId(6), read] uint8 Reserved2;
+};
+
+[dynamic: ToInstance, EventType(28)]
+class SystemConfig_V2_DPI : SystemConfig_V2
+{
+	[WmiDataId(1), read] uint32 MachineDPI;
+	[WmiDataId(2), read] uint32 UserDPI;
+};
+
+[dynamic: ToInstance, EventType(13)]
+class SystemConfig_V2_NIC : SystemConfig_V2
+{
+	[WmiDataId(1), format("x"), read] uint64 PhysicalAddr;
+	[WmiDataId(2), read] uint32 PhysicalAddrLen;
+	[WmiDataId(3), read] uint32 Ipv4Index;
+	[WmiDataId(4), read] uint32 Ipv6Index;
+	[WmiDataId(5), StringTermination("NullTerminated"), format("w"), read] string NICDescription;
+	[WmiDataId(6), StringTermination("NullTerminated"), format("w"), read] string IpAddresses;
+	[WmiDataId(7), StringTermination("NullTerminated"), format("w"), read] string DnsServerAddresses;
+};
+
+[dynamic: ToInstance, EventType(10)]
+class SystemConfig_V2_CPU : SystemConfig_V2
+{
+	[WmiDataId(1), read] uint32 MHz;
+	[WmiDataId(2), read] uint32 NumberOfProcessors;
+	[WmiDataId(3), read] uint32 MemSize;
+	[WmiDataId(4), read] uint32 PageSize;
+	[WmiDataId(5), read] uint32 AllocationGranularity;
+	[WmiDataId(6), format("s"), read, MAX(256)] char16 ComputerName;
+	[WmiDataId(7), format("s"), read, MAX(134)] char16 DomainName;
+	[WmiDataId(8), pointer, read] uint32 HyperThreadingFlag;
+};
+
+[dynamic: ToInstance, EventType(33)]
+class SystemConfig_V2_DeviceFamily : SystemConfig_V2
+{
+	[WmiDataId(1), read] uint64 UAPInfo;
+	[WmiDataId(2), read] uint32 DeviceFamily;
+	[WmiDataId(3), read] uint32 DeviceForm;
+};
+
+[dynamic: ToInstance, EventType(18)]
+class SystemConfig_V2_OpticalMedia : SystemConfig_V2
+{
+	[WmiDataId(1), read] uint16 DiskNumber;
+	[WmiDataId(2), read] uint16 BusType;
+	[WmiDataId(3), read] uint16 DeviceType;
+	[WmiDataId(4), read] uint16 MediaType;
+	[WmiDataId(5), read] uint64 StartingOffset;
+	[WmiDataId(6), read] uint64 Size;
+	[WmiDataId(7), read] uint64 NumberOfFreeBlocks;
+	[WmiDataId(8), read] uint64 TotalNumberOfBlocks;
+	[WmiDataId(9), read] uint64 NextWritableAddress;
+	[WmiDataId(10), read] uint32 NumberOfSessions;
+	[WmiDataId(11), read] uint32 NumberOfTracks;
+	[WmiDataId(12), read] uint32 BytesPerSector;
+	[WmiDataId(13), read] uint16 DiscStatus;
+	[WmiDataId(14), read] uint16 LastSessionStatus;
+	[WmiDataId(15), StringTermination("NullTerminated"), format("w"), read] string DriveLetter;
+	[WmiDataId(16), StringTermination("NullTerminated"), format("w"), read] string FileSystemName;
+	[WmiDataId(17), StringTermination("NullTerminated"), format("a"), read] string DeviceName;
+	[WmiDataId(18), StringTermination("NullTerminated"), format("a"), read] string ManufacturerName;
+};
+
+[dynamic: ToInstance, EventType(27)]
+class SystemConfig_V2_ProcNumber : SystemConfig_V2
+{
+	[WmiDataId(1), read] uint32 ProcessorCount;
+	[WmiDataId(2), format("x"), WmiSizeIs("ProcessorCount"), read] uint32 ProcessorNumber;
+};
+
+[dynamic: ToInstance, EventType(14)]
+class SystemConfig_V2_Video : SystemConfig_V2
+{
+	[WmiDataId(1), read] uint32 MemorySize;
+	[WmiDataId(2), read] uint32 XResolution;
+	[WmiDataId(3), read] uint32 YResolution;
+	[WmiDataId(4), read] uint32 BitsPerPixel;
+	[WmiDataId(5), read] uint32 VRefresh;
+	[WmiDataId(6), format("s"), read, MAX(256)] char16 ChipType;
+	[WmiDataId(7), format("s"), read, MAX(256)] char16 DACType;
+	[WmiDataId(8), format("s"), read, MAX(256)] char16 AdapterString;
+	[WmiDataId(9), format("s"), read, MAX(256)] char16 BiosString;
+	[WmiDataId(10), format("s"), read, MAX(256)] char16 DeviceId;
+	[WmiDataId(11), format("x"), read] uint32 StateFlags;
+};
+
+[dynamic: ToInstance, EventType(17)]
+class SystemConfig_V2_Network : SystemConfig_V2
+{
+	[WmiDataId(1), read] uint32 TcbTablePartitions;
+	[WmiDataId(2), read] uint32 MaxHashTableSize;
+	[WmiDataId(3), read] uint32 MaxUserPort;
+	[WmiDataId(4), read] uint32 TcpTimedWaitDelay;
+};
+
+[dynamic: ToInstance, EventType(31)]
+class SystemConfig_V2_Defrag : SystemConfig_V2
+{
+	[WmiDataId(1), read] uint64 AlignmentClusters;
+	[WmiDataId(2), read] uint64 AvgFreeSpaceSize;
+	[WmiDataId(3), read] uint64 ClustersPerSlab;
+	[WmiDataId(4), read] uint64 FragmentedDirectoryExtents;
+	[WmiDataId(5), read] uint64 FragmentedExtents;
+	[WmiDataId(6), read] uint64 FreeSpaceCount;
+	[WmiDataId(7), read] uint64 LargestFreeSpaceSize;
+	[WmiDataId(8), read] uint64 LastRunActualPurgeClusters;
+	[WmiDataId(9), read] uint64 LastRunClustersTrimmed;
+	[WmiDataId(10), read] uint64 LastRunFullDefragTime;
+	[WmiDataId(11), read] uint64 LastRunTime;
+	[WmiDataId(12), read] uint64 MFTSize;
+	[WmiDataId(13), read] uint64 TotalClusters;
+	[WmiDataId(14), read] uint64 TotalUsedClusters;
+	[WmiDataId(15), read] uint32 AvgFragmentsPerFile;
+	[WmiDataId(16), read] uint32 BytesPerCluster;
+	[WmiDataId(17), read] uint32 DirectoryCount;
+	[WmiDataId(18), read] uint32 FragmentedDirectories;
+	[WmiDataId(19), read] uint32 FragmentedFiles;
+	[WmiDataId(20), read] uint32 FragmentedSpace;
+	[WmiDataId(21), read] uint32 HardwareIssue;
+	[WmiDataId(22), read] uint32 InUseMFTRecords;
+	[WmiDataId(23), read] uint32 InUseSlabs;
+	[WmiDataId(24), read] uint32 LastRunActualPurgeSlabs;
+	[WmiDataId(25), read] uint32 LastRunInitialBackedSlabs;
+	[WmiDataId(26), read] uint32 LastRunPercentFragmentation;
+	[WmiDataId(27), read] uint32 LastRunPinnedSlabs;
+	[WmiDataId(28), read] uint32 LastRunPotentialPurgeSlabs;
+	[WmiDataId(29), read] uint32 LastRunSpaceInefficientSlabs;
+	[WmiDataId(30), read] uint32 LastRunTrimmedSlabs;
+	[WmiDataId(31), read] uint32 LastRunUnknownEvictFailSlabs;
+	[WmiDataId(32), read] uint32 LastRunVolsnapPinnedSlabs;
+	[WmiDataId(33), read] uint32 MFTFragmentCount;
+	[WmiDataId(34), read] uint32 MovableFiles;
+	[WmiDataId(35), read] uint32 TotalMFTRecords;
+	[WmiDataId(36), read] uint32 TotalSlabs;
+	[WmiDataId(37), read] uint32 UnmovableFiles;
+	[WmiDataId(38), extension("GUID"), read] object VolumeId;
+	[WmiDataId(39), StringTermination("NullTerminated"), format("w"), read] string VolumePathNames;
+};
+
+[dynamic: ToInstance, EventType(35)]
+class SystemConfig_V2_Processors : SystemConfig_V2
+{
+	[WmiDataId(1), read] uint32 ProcessorIndex;
+	[WmiDataId(2), read] uint32 FeatureSet;
+	[WmiDataId(3), read] uint32 ProcessorSpeed;
+	[WmiDataId(4), format("s"), read, MAX(64)] char16 ProcessorName;
+	[WmiDataId(5), format("s"), read, MAX(16)] char16 VendorIdentifier;
+	[WmiDataId(6), format("s"), read, MAX(128)] char16 ProcessorIdentifier;
+};
+
+[dynamic: ToInstance, EventType(25)]
+class SystemConfig_V2_Platform : SystemConfig_V2
+{
+	[WmiDataId(1), StringTermination("NullTerminated"), format("w"), read] string SystemManufacturer;
+	[WmiDataId(2), StringTermination("NullTerminated"), format("w"), read] string SystemProductName;
+	[WmiDataId(3), StringTermination("NullTerminated"), format("w"), read] string BiosDate;
+	[WmiDataId(4), StringTermination("NullTerminated"), format("w"), read] string BiosVersion;
+};
+
+[dynamic: ToInstance, EventType(26)]
+class SystemConfig_V2_ProcGroup : SystemConfig_V2
+{
+	[WmiDataId(1), read] uint32 GroupCount;
+	[WmiDataId(2), format("x"), WmiSizeIs("GroupCount"), pointer, read] uint32 Affinity;
+};
+
+[dynamic: ToInstance, EventType(15)]
+class SystemConfig_V2_Services : SystemConfig_V2
+{
+	[WmiDataId(1), format("x"), read] uint32 ProcessId;
+	[WmiDataId(2), format("x"), read] uint32 ServiceState;
+	[WmiDataId(3), format("x"), read] uint32 SubProcessTag;
+	[WmiDataId(4), StringTermination("NullTerminated"), format("w"), read] string ServiceName;
+	[WmiDataId(5), StringTermination("NullTerminated"), format("w"), read] string DisplayName;
+	[WmiDataId(6), StringTermination("NullTerminated"), format("w"), read] string ProcessName;
+};
+
+[dynamic: ToInstance, EventType(11)]
+class SystemConfig_V2_PhyDisk : SystemConfig_V2
+{
+	[WmiDataId(1), read] uint32 DiskNumber;
+	[WmiDataId(2), read] uint32 BytesPerSector;
+	[WmiDataId(3), read] uint32 SectorsPerTrack;
+	[WmiDataId(4), read] uint32 TracksPerCylinder;
+	[WmiDataId(5), read] uint64 Cylinders;
+	[WmiDataId(6), read] uint32 SCSIPort;
+	[WmiDataId(7), read] uint32 SCSIPath;
+	[WmiDataId(8), read] uint32 SCSITarget;
+	[WmiDataId(9), read] uint32 SCSILun;
+	[WmiDataId(10), format("s"), read, MAX(256)] char16 Manufacturer;
+	[WmiDataId(11), read] uint32 PartitionCount;
+	[WmiDataId(12), read] uint8 WriteCacheEnabled;
+	[WmiDataId(13), read] uint8 Pad;
+	[WmiDataId(14), format("s"), read, MAX(3)] char16 BootDriveLetter;
+	[WmiDataId(15), read, MAX(2)] char16 Spare;
+};
+
+[dynamic: ToInstance, EventType(16)]
+class SystemConfig_V2_Power : SystemConfig_V2
+{
+	[WmiDataId(1), read] uint8 S1;
+	[WmiDataId(2), read] uint8 S2;
+	[WmiDataId(3), read] uint8 S3;
+	[WmiDataId(4), read] uint8 S4;
+	[WmiDataId(5), read] uint8 S5;
+	[WmiDataId(6), read] uint8 Pad1;
+	[WmiDataId(7), read] uint8 Pad2;
+	[WmiDataId(8), read] uint8 Pad3;
+};
+
+[dynamic: ToInstance, EventType(34)]
+class SystemConfig_V2_FlightIds : SystemConfig_V2
+{
+	[WmiDataId(1), StringTermination("NullTerminated"), format("w"), read] string UpdateId;
+	[WmiDataId(2), StringTermination("NullTerminated"), format("w"), read] string FlightIdList;
+};
+
+[dynamic: ToInstance, EventType(32)]
+class SystemConfig_V2_MobilePlatform : SystemConfig_V2
+{
+	[WmiDataId(1), StringTermination("NullTerminated"), format("w"), read] string BootLoaderVersion;
+	[WmiDataId(2), StringTermination("NullTerminated"), format("w"), read] string FirmwareRevision;
+	[WmiDataId(3), StringTermination("NullTerminated"), format("w"), read] string FriendlyName;
+	[WmiDataId(4), StringTermination("NullTerminated"), format("w"), read] string HardwareRevision;
+	[WmiDataId(5), StringTermination("NullTerminated"), format("w"), read] string Manufacturer;
+	[WmiDataId(6), StringTermination("NullTerminated"), format("w"), read] string ManufacturerDisplayName;
+	[WmiDataId(7), StringTermination("NullTerminated"), format("w"), read] string ManufacturerModelName;
+	[WmiDataId(8), StringTermination("NullTerminated"), format("w"), read] string MobileOperatorDisplayName;
+	[WmiDataId(9), StringTermination("NullTerminated"), format("w"), read] string MobileOperatorName;
+	[WmiDataId(10), StringTermination("NullTerminated"), format("w"), read] string ModelName;
+	[WmiDataId(11), StringTermination("NullTerminated"), format("w"), read] string RadioHardwareRevision;
+	[WmiDataId(12), StringTermination("NullTerminated"), format("w"), read] string RadioSoftwareRevision;
+	[WmiDataId(13), StringTermination("NullTerminated"), format("w"), read] string ROMVersion;
+	[WmiDataId(14), StringTermination("NullTerminated"), format("w"), read] string SOCVersion;
+	[WmiDataId(15), StringTermination("NullTerminated"), format("w"), read] string HardwareVariant;
+};
+
+[dynamic: ToInstance, EventType(30)]
+class SystemConfig_V2_TelemetryInfo : SystemConfig_V2
+{
+	[WmiDataId(1), extension("GUID"), read] object MachineId;
+};
+
+[dynamic: ToInstance, EventType(21)]
+class SystemConfig_V2_IRQ : SystemConfig_V2
+{
+	[WmiDataId(1), format("x"), read] uint64 IRQAffinity;
+	[WmiDataId(2), read] uint32 IRQNum;
+	[WmiDataId(3), read] uint32 DeviceDescriptionLen;
+	[WmiDataId(4), StringTermination("NullTerminated"), format("w"), read] string DeviceDescription;
+};
+
+[dynamic: ToInstance, Guid("{3d6fa8d1-fe05-11d0-9dda-00c04fd7ba7c}"), EventVersion(1)]
+class Thread_V1 : MSNT_SystemTrace
+{
+};
+
+[dynamic: ToInstance, EventType{2}]
+class Thread_V1_TypeGroup2 : Thread_V1
+{
+	[WmiDataId(1), format("x"), read] uint32 ProcessId;
+	[WmiDataId(2), format("x"), read] uint32 TThreadId;
+};
+
+[dynamic: ToInstance, EventType{1, 3, 4}]
+class Thread_V1_TypeGroup1 : Thread_V1
+{
+	[WmiDataId(1), format("x"), read] uint32 ProcessId;
+	[WmiDataId(2), format("x"), read] uint32 TThreadId;
+	[WmiDataId(3), pointer, read] uint32 StackBase;
+	[WmiDataId(4), pointer, read] uint32 StackLimit;
+	[WmiDataId(5), pointer, read] uint32 UserStackBase;
+	[WmiDataId(6), pointer, read] uint32 UserStackLimit;
+	[WmiDataId(7), pointer, read] uint32 StartAddr;
+	[WmiDataId(8), pointer, read] uint32 Win32StartAddr;
+	[WmiDataId(9), read] sint8 WaitMode;
+};
+
+[dynamic: ToInstance, EventType(36)]
+class CSwitch_V1 : Thread_V1
+{
+	[WmiDataId(1), format("x"), read] uint32 NewThreadId;
+	[WmiDataId(2), format("x"), read] uint32 OldThreadId;
+	[WmiDataId(3), read] sint8 NewThreadPriority;
+	[WmiDataId(4), read] sint8 OldThreadPriority;
+	[WmiDataId(5), read] sint8 NewThreadQuantum;
+	[WmiDataId(6), read] sint8 OldThreadQuantum;
+	[WmiDataId(7), read] sint8 OldThreadWaitReason;
+	[WmiDataId(8), read] sint8 OldThreadWaitMode;
+	[WmiDataId(9), read] sint8 OldThreadState;
+	[WmiDataId(10), read] sint8 OldThreadWaitIdealProcessor;
+};
+
+[dynamic: ToInstance, EventType(57)]
+class WorkerThread_V1 : Thread_V1
+{
+	[WmiDataId(1), format("x"), read] uint32 TThreadId;
+	[WmiDataId(2), read] uint64 StartTime;
+	[WmiDataId(3), pointer, read] uint32 ThreadRoutine;
+};
+
+[dynamic: ToInstance, Guid("{9a280ac0-c8e0-11d1-84e2-00c04fb998a2}"), EventVersion(0)]
+class TcpIp_V0 : MSNT_SystemTrace
+{
+};
+
+[dynamic: ToInstance, EventType{10, 11, 12, 13, 14, 15}]
+class TcpIp_V0_TypeGroup1 : TcpIp_V0
+{
+	[WmiDataId(1), extension("IPAddr"), read] object daddr;
+	[WmiDataId(2), extension("IPAddr"), read] object saddr;
+	[WmiDataId(3), extension("Port"), read] object dport;
+	[WmiDataId(4), extension("Port"), read] object sport;
+	[WmiDataId(5), read] uint32 size;
+	[WmiDataId(6), read] uint32 PID;
+};
+
+[dynamic: ToInstance, Guid("{3d6fa8d0-fe05-11d0-9dda-00c04fd7ba7c}"), EventVersion(2)]
+class Process_V2 : MSNT_SystemTrace
+{
+};
+
+[dynamic: ToInstance, EventType{96, 97, 98, 99}]
+class Process_V2_TypeGroup5 : Process_V2
+{
+	[WmiDataId(1), pointer, read] uint32 Object;
+};
+
+[dynamic: ToInstance, EventType{48, 49, 50, 51, 52, 64, 65, 66, 67, 68, 80, 81, 82, 83, 84}]
+class Process_V2_TypeGroup4 : Process_V2
+{
+	[WmiDataId(1), pointer, read] uint32 Object;
+	[WmiDataId(2), pointer, read] uint32 Tag;
+	[WmiDataId(3), format("x"), read] uint32 ProcessId;
+	[WmiDataId(4), read] uint32 Count;
+};
+
+[dynamic: ToInstance, EventType{32, 33}]
+class Process_V2_TypeGroup2 : Process_V2
+{
+	[WmiDataId(1), format("x"), read] uint32 ProcessId;
+	[WmiDataId(2), read] uint32 PageFaultCount;
+	[WmiDataId(3), read] uint32 HandleCount;
+	[WmiDataId(4), read] uint32 Reserved;
+	[WmiDataId(5), extension("SizeT"), read] object PeakVirtualSize;
+	[WmiDataId(6), extension("SizeT"), read] object PeakWorkingSetSize;
+	[WmiDataId(7), extension("SizeT"), read] object PeakPagefileUsage;
+	[WmiDataId(8), extension("SizeT"), read] object QuotaPeakPagedPoolUsage;
+	[WmiDataId(9), extension("SizeT"), read] object QuotaPeakNonPagedPoolUsage;
+	[WmiDataId(10), extension("SizeT"), read] object VirtualSize;
+	[WmiDataId(11), extension("SizeT"), read] object WorkingSetSize;
+	[WmiDataId(12), extension("SizeT"), read] object PagefileUsage;
+	[WmiDataId(13), extension("SizeT"), read] object QuotaPagedPoolUsage;
+	[WmiDataId(14), extension("SizeT"), read] object QuotaNonPagedPoolUsage;
+	[WmiDataId(15), extension("SizeT"), read] object PrivatePageCount;
+};
+
+[dynamic: ToInstance, EventType{1, 2, 3, 4, 39}]
+class Process_V2_TypeGroup1 : Process_V2
+{
+	[WmiDataId(1), pointer, read] uint32 UniqueProcessKey;
+	[WmiDataId(2), format("x"), read] uint32 ProcessId;
+	[WmiDataId(3), format("x"), read] uint32 ParentId;
+	[WmiDataId(4), read] uint32 SessionId;
+	[WmiDataId(5), read] sint32 ExitStatus;
+	[WmiDataId(6), extension("Sid"), read] object UserSID;
+	[WmiDataId(7), StringTermination("NullTerminated"), read] string ImageFileName;
+	[WmiDataId(8), StringTermination("NullTerminated"), format("w"), read] string CommandLine;
+};
+
+[dynamic: ToInstance, EventType{11}]
+class Process_Terminate_TypeGroup1 : Process_V2
+{
+	[WmiDataId(1), format("x"), read] uint32 ProcessId;
+};
+
+[dynamic: ToInstance, EventType(35)]
+class Process_V2_TypeGroup3 : Process_V2
+{
+	[WmiDataId(1), pointer, read] uint32 DirectoryTableBase;
+	[WmiDataId(2), format("x"), read] uint32 ProcessId;
+};
+
+[dynamic: ToInstance, Guid("{3d6fa8d0-fe05-11d0-9dda-00c04fd7ba7c}"), EventVersion(4)]
+class Process_V4 : MSNT_SystemTrace
+{
+};
+
+[dynamic: ToInstance, EventType{1, 2, 3, 4, 39}]
+class Process_V4_TypeGroup1 : Process_V4
+{
+	[WmiDataId(1), pointer, read] uint32 UniqueProcessKey;
+	[WmiDataId(2), format("x"), read] uint32 ProcessId;
+	[WmiDataId(3), format("x"), read] uint32 ParentId;
+	[WmiDataId(4), read] uint32 SessionId;
+	[WmiDataId(5), read] sint32 ExitStatus;
+	[WmiDataId(6), pointer, read] uint32 DirectoryTableBase;
+	[WmiDataId(8), extension("Sid"), read] object UserSID;
+	[WmiDataId(9), StringTermination("NullTerminated"), read] string ImageFileName;
+	[WmiDataId(10), StringTermination("NullTerminated"), format("w"), read] string CommandLine;
+	[WmiDataId(11), StringTermination("NullTerminated"), format("w"), read] string PackageFullName;
+	[WmiDataId(12), StringTermination("NullTerminated"), format("w"), read] string ApplicationId;
+};
+
+[dynamic: ToInstance, Guid("{e43445e0-0903-48c3-b878-ff0fccebdd04}"), EventVersion(2)]
+class PowerEvents : MSNT_SystemTrace
+{
+};
+
+[dynamic: ToInstance, EventType(60)]
+class IdleExitLatency : PowerEvents
+{
+	[WmiDataId(2), read] uint32 PlatformState;
+	[WmiDataId(3), read] uint32 ProcessorState;
+	[WmiDataId(4), read] uint32 ReturnLatency;
+	[WmiDataId(5), read] uint32 TotalLatency;
+};
+
+[dynamic: ToInstance, Guid("{3d6fa8d0-fe05-11d0-9dda-00c04fd7ba7c}"), EventVersion(3)]
+class Process_V3 : MSNT_SystemTrace
+{
+};
+
+[dynamic: ToInstance, EventType{1, 2, 3, 4, 39}]
+class Process_V3_TypeGroup1 : Process_V3
+{
+	[WmiDataId(1), pointer, read] uint32 UniqueProcessKey;
+	[WmiDataId(2), format("x"), read] uint32 ProcessId;
+	[WmiDataId(3), format("x"), read] uint32 ParentId;
+	[WmiDataId(4), read] uint32 SessionId;
+	[WmiDataId(5), read] sint32 ExitStatus;
+	[WmiDataId(6), pointer, read] uint32 DirectoryTableBase;
+	[WmiDataId(7), extension("Sid"), read] object UserSID;
+	[WmiDataId(8), StringTermination("NullTerminated"), read] string ImageFileName;
+	[WmiDataId(9), StringTermination("NullTerminated"), format("w"), read] string CommandLine;
+};
+
+[dynamic: ToInstance, Guid("{45d8cccd-539f-4b72-a8b7-5c683142609a}"), EventVersion(2)]
+class ALPC : MSNT_SystemTrace
+{
+};
+
+[dynamic: ToInstance, EventType(34)]
+class ALPC_Receive_Message : ALPC
+{
+	[WmiDataId(1), read] uint32 MessageID;
+};
+
+[dynamic: ToInstance, EventType(35)]
+class ALPC_Wait_For_Reply : ALPC
+{
+	[WmiDataId(1), read] uint32 MessageID;
+};
+
+[dynamic: ToInstance, EventType(33)]
+class ALPC_Send_Message : ALPC
+{
+	[WmiDataId(1), read] uint32 MessageID;
+};
+
+[dynamic: ToInstance, EventType(37)]
+class ALPC_Unwait : ALPC
+{
+	[WmiDataId(1), read] uint32 Status;
+};
+
+[dynamic: ToInstance, EventType(36)]
+class ALPC_Wait_For_New_Message : ALPC
+{
+	[WmiDataId(1), read] uint32 IsServerPort;
+	[WmiDataId(2), StringTermination("NullTerminated"), format("w"), read] string PortName;
+};
+
+[dynamic: ToInstance, Guid("{2cb15d1d-5fc1-11d2-abe1-00a0c911f518}"), EventVersion(3)]
+class Image : MSNT_SystemTrace
+{
+};
+
+[dynamic: ToInstance, EventType{10, 2, 3, 4}]
+class Image_Load : Image
+{
+	[WmiDataId(1), pointer, read] uint32 ImageBase;
+	[WmiDataId(2), pointer, read] uint32 ImageSize;
+	[WmiDataId(3), read] uint32 ProcessId;
+	[WmiDataId(4), read] uint32 ImageChecksum;
+	[WmiDataId(5), read] uint32 TimeDateStamp;
+	[WmiDataId(6), read] uint8 SignatureLevel;
+	[WmiDataId(7), read] uint8 SignatureType;
+	[WmiDataId(8), read] uint16 Reserved0;
+	[WmiDataId(9), pointer, read] uint32 DefaultBase;
+	[WmiDataId(10), read] uint32 Reserved1;
+	[WmiDataId(11), read] uint32 Reserved2;
+	[WmiDataId(12), read] uint32 Reserved3;
+	[WmiDataId(13), read] uint32 Reserved4;
+	[WmiDataId(14), StringTermination("NullTerminated"), format("w"), read] string FileName;
+};
+
+[dynamic: ToInstance, EventType{212}]
+class LoaderDllSearchResults : Image
+{
+	[WmiDataId(1), format("x"), read] uint32 LdrLoadFlags;
+	[WmiDataId(2), format("x"), read] uint32 LdrSearchFlags;
+	[WmiDataId(3), format("x"), read] uint32 SearchInfo;
+	[WmiDataId(4), format("x"), read] uint32 LoadReason;
+	[WmiDataId(5), StringTermination("NullTerminated"), format("w"), read] string FullDllName;
+};
+
+[dynamic: ToInstance, EventType{176, 177}]
+class LoaderNewDllEvent : Image
+{
+	[WmiDataId(1), format("x"), pointer, read] uint32 NewDllBaseAddress;
+	[WmiDataId(2), format("x"), pointer, read] uint32 ParentDllBaseAddress;
+	[WmiDataId(3), format("x"), read] uint32 LoadReason;
+	[WmiDataId(4), StringTermination("NullTerminated"), format("w"), read] string FilePath;
+};
+
+[dynamic: ToInstance, EventType{192, 193}]
+class LoaderCodedEventPath : Image
+{
+	[WmiDataId(1), format("x"), read] uint64 BaseAddress;
+	[WmiDataId(2), format("x"), read] uint8 ErrorOpcode;
+	[WmiDataId(3), read] sint8 Code;
+	[WmiDataId(4), StringTermination("NullTerminated"), format("w"), read] string String1;
+	[WmiDataId(5), StringTermination("NullTerminated"), format("w"), read] string String2;
+};
+
+[dynamic: ToInstance, EventType{165, 166, 167, 168, 169, 170, 171, 172, 173, 174, 208, 209, 210, 211}]
+class LoaderCodedEventStatus : Image
+{
+	[WmiDataId(1), format("x"), read] uint64 BaseAddress;
+	[WmiDataId(2), format("x"), read] uint8 ErrorOpcode;
+	[WmiDataId(3), read] sint8 Code;
+	[WmiDataId(4), StringTermination("NullTerminated"), format("w"), read] string String;
+};
+
+[dynamic: ToInstance, EventType{213}]
+class LoaderPathSearchResults : Image
+{
+	[WmiDataId(1), format("x"), read] uint32 SearchInfo;
+	[WmiDataId(2), StringTermination("NullTerminated"), format("w"), read] string Cwd;
+	[WmiDataId(3), StringTermination("NullTerminated"), format("w"), read] string AppDir;
+	[WmiDataId(4), StringTermination("NullTerminated"), format("w"), read] string DllDir;
+	[WmiDataId(5), StringTermination("NullTerminated"), format("w"), read] string DllLoadDir;
+};
