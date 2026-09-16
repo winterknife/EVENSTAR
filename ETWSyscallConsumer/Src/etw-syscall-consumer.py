@@ -75,8 +75,6 @@ def event_callback(event_tufo):
                 kernel_stack.append(f"0x{retaddr:x}")
                 continue
             user_stack.append(f"0x{retaddr:x}")
-        if not user_stack:
-            return
         event_dict = {
             "Timestamp": timestamp,
             "PID": pid,
