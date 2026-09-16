@@ -1,22 +1,37 @@
 #!/usr/bin/env -S uv run --script
 #
 # /// script
-# requires-python = ">=3.14"
-# dependencies = ["pywintrace", "psutil"]
+# requires-python = "==3.9.*"
+# dependencies = ["pywintrace", "lief-extended", "pythonforwindows", "psutil"]
+# [tool.uv.sources]
+# pywintrace = { url = "https://github.com/winterknife/pywintrace/releases/download/v1.0.0/pywintrace-1.0.0-py3-none-any.whl" }
+# lief-extended = { path = "./lief_extended-2.0.0.post3335-cp39-cp39-win_amd64.whl" }
+# pythonforwindows = { url = "https://files.pythonhosted.org/packages/01/3b/bf4a9a401ea2cd867aa4522a97ffa2f5b60a38c3249887f77f0f997d7743/pythonforwindows-1.0.4-py3-none-any.whl" }
+# psutil = { url = "https://files.pythonhosted.org/packages/b4/90/e2159492b5426be0c1fef7acba807a03511f97c5f86b3caeda6ad92351a7/psutil-7.2.2-cp37-abi3-win_amd64.whl" }
 # ///
 
 
 """
-[!] Usage: kdu.exe -prv 27 -pse "python.exe etw-ti-consumer.py [PID of process to be monitored] [output filename]"
-[!] Note: Please launch from an admin shell to be able to load the driver.
+[!] Export dependencies: uv.exe export --script etw-ti-consumer.py --format requirements.txt --output-file requirements.txt
+[!] Find Python: uv.exe python find 3.9
+[!] Install dependencies: [Path to Python 3.9 executable] -m pip install -r requirements.txt --break-system-packages
+[!] Usage: kdu.exe -prv 27 -pse "[Path to Python 3.9 executable] etw-ti-consumer.py [PID of process to be monitored] [output filename]"
+[!] Note: Please launch from an admin shell to be able to consume events.
 """
 
 import sys
 import etw
 from etw.etw import ProviderParameters
 import json
+import os
 import ctypes
 import psutil
+import lief
+import windows
+from urllib.request import urlopen
+from pathlib import Path
+from uuid import UUID
+from bisect import bisect_right
 from datetime import datetime, timezone, timedelta
 
 events = []
@@ -35,8 +50,10 @@ def event_callback(event_tufo):
     target_pid = payload.get("TargetProcessId")
 
     user_stack = []
+    kernel_stack = []
     for retaddr in payload["EventExtendedData"]["StackTrace64"]["Address"]:
         if retaddr > 0x7FFFFFFEFFFF:  # MM_HIGHEST_USER_ADDRESS
+            kernel_stack.append(f"0x{retaddr:x}")
             continue
         user_stack.append(f"0x{retaddr:x}")
 
@@ -61,6 +78,7 @@ def event_callback(event_tufo):
             "Region Size": payload["RegionSize"],
             "Protection Mask": hex(payload["ProtectionMask"]),
             "User Stack": user_stack,
+            "Kernel Stack": kernel_stack,
         }
         events.append(event_dict)
     elif event_id == 6:
@@ -74,6 +92,7 @@ def event_callback(event_tufo):
             "Region Size": payload["RegionSize"],
             "Protection Mask": hex(payload["ProtectionMask"]),
             "User Stack": user_stack,
+            "Kernel Stack": kernel_stack,
         }
         events.append(event_dict)
     elif event_id == 7:
@@ -94,6 +113,7 @@ def event_callback(event_tufo):
             "VAD MMF Name": payload["VaVadMmfName"],
             "Target Address": payload["TargetAddress"],
             "User Stack": user_stack,
+            "Kernel Stack": kernel_stack,
         }
         events.append(event_dict)
     elif event_id == 2:
@@ -115,6 +135,7 @@ def event_callback(event_tufo):
             "VAD MMF Name": payload["VaVadMmfName"],
             "Target Address": payload["TargetAddress"],
             "User Stack": user_stack,
+            "Kernel Stack": kernel_stack,
         }
         events.append(event_dict)
     elif event_id == 11:
@@ -127,6 +148,7 @@ def event_callback(event_tufo):
             "Base Address": payload["BaseAddress"],
             "Bytes Read": payload["BytesCopied"],
             "User Stack": user_stack,
+            "Kernel Stack": kernel_stack,
         }
         events.append(event_dict)
     elif event_id == 13:
@@ -145,6 +167,7 @@ def event_callback(event_tufo):
             "VAD Region Size": payload["VaVadRegionSize"],
             "VAD MMF Name": payload["VaVadMmfName"],
             "User Stack": user_stack,
+            "Kernel Stack": kernel_stack,
         }
         events.append(event_dict)
     elif event_id == 12:
@@ -157,6 +180,7 @@ def event_callback(event_tufo):
             "Base Address": payload["BaseAddress"],
             "Bytes Written": payload["BytesCopied"],
             "User Stack": user_stack,
+            "Kernel Stack": kernel_stack,
         }
         events.append(event_dict)
     elif event_id == 14:
@@ -175,6 +199,7 @@ def event_callback(event_tufo):
             "VAD Region Size": payload["VaVadRegionSize"],
             "VAD MMF Name": payload["VaVadMmfName"],
             "User Stack": user_stack,
+            "Kernel Stack": kernel_stack,
         }
         events.append(event_dict)
     elif event_id == 8:
@@ -188,6 +213,7 @@ def event_callback(event_tufo):
             "View Size": payload["ViewSize"],
             "Protection Mask": hex(payload["ProtectionMask"]),
             "User Stack": user_stack,
+            "Kernel Stack": kernel_stack,
         }
         events.append(event_dict)
     elif event_id == 3:
@@ -202,6 +228,7 @@ def event_callback(event_tufo):
             "View Size": payload["ViewSize"],
             "Protection Mask": hex(payload["ProtectionMask"]),
             "User Stack": user_stack,
+            "Kernel Stack": kernel_stack,
         }
         events.append(event_dict)
     elif event_id == 4:
@@ -237,6 +264,7 @@ def event_callback(event_tufo):
             "APC Argument 1 VAD Region Size": payload["ApcArgument1VadRegionSize"],
             "APC Argument 1 VAD MMF Name": payload["ApcArgument1VadMmfName"],
             "User Stack": user_stack,
+            "Kernel Stack": kernel_stack,
         }
         events.append(event_dict)
     elif event_id == 5:
@@ -267,6 +295,7 @@ def event_callback(event_tufo):
             "RIP VAD Region Size": payload["PcVadRegionSize"],
             "RIP VAD MMF Name": payload["PcVadMmfName"],
             "User Stack": user_stack,
+            "Kernel Stack": kernel_stack,
         }
         events.append(event_dict)
     elif event_id == 15:
@@ -279,6 +308,7 @@ def event_callback(event_tufo):
             "Target PID": target_pid,
             "Target TID": payload["TargetThreadId"],
             "User Stack": user_stack,
+            "Kernel Stack": kernel_stack,
         }
         events.append(event_dict)
     elif event_id == 16:
@@ -291,6 +321,7 @@ def event_callback(event_tufo):
             "Target PID": target_pid,
             "Target TID": payload["TargetThreadId"],
             "User Stack": user_stack,
+            "Kernel Stack": kernel_stack,
         }
         events.append(event_dict)
     elif event_id == 17:
@@ -302,6 +333,7 @@ def event_callback(event_tufo):
             "Calling TID": calling_tid,
             "Target PID": target_pid,
             "User Stack": user_stack,
+            "Kernel Stack": kernel_stack,
         }
         events.append(event_dict)
     elif event_id == 18:
@@ -313,6 +345,7 @@ def event_callback(event_tufo):
             "Calling TID": calling_tid,
             "Target PID": target_pid,
             "User Stack": user_stack,
+            "Kernel Stack": kernel_stack,
         }
         events.append(event_dict)
     elif event_id == 19:
@@ -324,6 +357,7 @@ def event_callback(event_tufo):
             "Calling TID": calling_tid,
             "Target PID": target_pid,
             "User Stack": user_stack,
+            "Kernel Stack": kernel_stack,
         }
         events.append(event_dict)
     elif event_id == 20:
@@ -335,6 +369,7 @@ def event_callback(event_tufo):
             "Calling TID": calling_tid,
             "Target PID": target_pid,
             "User Stack": user_stack,
+            "Kernel Stack": kernel_stack,
         }
         events.append(event_dict)
     elif event_id == 35:
@@ -348,6 +383,7 @@ def event_callback(event_tufo):
             "System Call Enum": payload["SyscallEnum"],
             "Primary Token Sandboxed": payload["IsSandboxedToken"],
             "User Stack": user_stack,
+            "Kernel Stack": kernel_stack,
         }
         events.append(event_dict)
     elif event_id == 33:
@@ -380,6 +416,7 @@ def event_callback(event_tufo):
             ),
             "Current Token Logon LUID": payload["CurrentTokenAuthenticationId"],
             "User Stack": user_stack,
+            "Kernel Stack": kernel_stack,
         }
         events.append(event_dict)
     elif event_id == 34:
@@ -390,6 +427,7 @@ def event_callback(event_tufo):
             "Calling PID": calling_pid,
             "Calling TID": calling_tid,
             "User Stack": user_stack,
+            "Kernel Stack": kernel_stack,
         }
         events.append(event_dict)
     elif event_id == 36:
@@ -422,6 +460,7 @@ def event_callback(event_tufo):
             ),
             "Current Token Logon LUID": payload["CurrentTokenAuthenticationId"],
             "User Stack": user_stack,
+            "Kernel Stack": kernel_stack,
         }
         events.append(event_dict)
 
@@ -435,11 +474,72 @@ def main():
     globals()["filter_pid"] = int(sys.argv[1])
     filename = sys.argv[2]
 
-    try:
-        file = open(filename, "w", encoding="utf-8")
-    except OSError:
-        print("[-] Invalid file path.")
+    symbols = {}
+    image_sizes = {}
+    for image_name, prefix in (("ntoskrnl.exe", "nt"), ("ntdll.dll", "ntdll")):
+        binary = lief.PE.parse(
+            str(Path(os.environ["SystemRoot"]) / "System32" / image_name)
+        )
+        image_sizes[prefix] = binary.optional_header.sizeof_image
+        pdb_name = Path(binary.codeview_pdb.filename).name
+        pdb_key = (
+            UUID(binary.codeview_pdb.guid).hex.upper() + f"{binary.codeview_pdb.age:x}"
+        )
+        pdb_path = (
+            Path(__file__).resolve().with_name(f"{Path(pdb_name).stem}-{pdb_key}.pdb")
+        )
+        if not pdb_path.is_file():
+            url = f"https://msdl.microsoft.com/download/symbols/{pdb_name}/{pdb_key}/{pdb_name}"
+            with urlopen(url, timeout=30) as response:
+                pdb_path.write_bytes(response.read())
+        debuginfo = lief.pdb.load(str(pdb_path))
+        if (
+            debuginfo is None
+            or UUID(debuginfo.guid) != UUID(binary.codeview_pdb.guid)
+            or debuginfo.age < binary.codeview_pdb.age
+        ):
+            print("[-] PDB not found.")
+            sys.exit(0)
+        symbols[prefix] = {}
+        for symbol in debuginfo.public_symbols:
+            if (
+                symbol is not None
+                and 0 < symbol.RVA < binary.optional_header.sizeof_image
+            ):
+                name = symbol.name
+                if prefix == "ntdll" and name.startswith("Zw"):
+                    name = "Nt" + name[2:]
+                symbols[prefix].setdefault(symbol.RVA, f"{prefix}!{name}")
+
+    ntdll_rvas = sorted(symbols["ntdll"])
+    ntoskrnl_rvas = sorted(symbols["nt"])
+
+    primary_token = windows.current_process.token
+    previous_privileges = primary_token.privileges
+    primary_token.enable_privilege("SeDebugPrivilege")
+    ntoskrnl_base = None
+    for module in windows.system.modules:
+        if module.name.rsplit(b"\\", 1)[-1].lower() == b"ntoskrnl.exe":
+            ntoskrnl_base = module.Base
+            break
+    if not ntoskrnl_base:
+        print("[-] ntoskrnl.exe base not found.")
         sys.exit(0)
+    primary_token.adjust_privileges(previous_privileges)
+    print(
+        f"[+] ntoskrnl.exe image base KVA: 0x{ntoskrnl_base & 0xFFFFFFFFFFFFFFFF:16X}"
+    )
+
+    target_process = windows.winobject.process.WinProcess(pid=filter_pid)
+    ntdll_base = None
+    for module in target_process.peb.modules:
+        if module.name.lower() == "ntdll.dll":
+            ntdll_base = module.baseaddr
+            break
+    if not ntdll_base:
+        print("[-] ntdll.dll base not found.")
+        sys.exit(0)
+    print(f"[+] ntdll.dll image base UVA: 0x{ntdll_base:016X}")
 
     params = ProviderParameters(
         event_property=4, event_filters=[]
@@ -539,6 +639,34 @@ def main():
         print("[+] Real-time buffers lost: ", stats.RealTimeBuffersLost)
         print("[+] Stopping capture.")
         job.stop()
+
+    for event in events:
+        for index, retaddr in enumerate(event["User Stack"]):
+            rva = int(retaddr, 16) - ntdll_base
+            if not 0 <= rva < image_sizes["ntdll"]:
+                continue
+            offset = bisect_right(ntdll_rvas, rva) - 1
+            if offset >= 0:
+                symbol_rva = ntdll_rvas[offset]
+                event["User Stack"][
+                    index
+                ] = f"{symbols['ntdll'][symbol_rva]}+0x{rva - symbol_rva:x}"
+        for index, retaddr in enumerate(event["Kernel Stack"]):
+            rva = int(retaddr, 16) - ntoskrnl_base
+            if not 0 <= rva < image_sizes["nt"]:
+                continue
+            offset = bisect_right(ntoskrnl_rvas, rva) - 1
+            if offset >= 0:
+                symbol_rva = ntoskrnl_rvas[offset]
+                event["Kernel Stack"][
+                    index
+                ] = f"{symbols['nt'][symbol_rva]}+0x{rva - symbol_rva:x}"
+
+    try:
+        file = open(filename, "w", encoding="utf-8")
+    except OSError:
+        print("[-] Invalid file path.")
+        sys.exit(0)
 
     json.dump(events, file, indent=4, default=str, ensure_ascii=False)
     file.close()
